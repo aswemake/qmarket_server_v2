@@ -38,16 +38,6 @@ const productSchema_v2 = new Schema({
         type: Number,
         required:true
     },
-    // 기본할인으로 상승된 가격
-    price: {
-        type: Number,
-        required:true
-    },
-    // 기본할인율
-    default_sale_ratio: {
-        type: Number,
-        required:true
-    },
     // 해시태그
     hashtag: {
         type: [String],
@@ -92,7 +82,7 @@ const productSchema_v2 = new Schema({
     },
     // 세일 이벤트
     events: {
-        type: [Object],
+        type: Object,
         required: true
     },
     // 성인 인증 여부
