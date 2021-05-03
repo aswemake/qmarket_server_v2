@@ -31,34 +31,37 @@ router.get('/', async (req, res) => {
             let price_preprocessing = async (products) => {
                 for (let i = 0; i < products.length; i++) {
                     // 가격 계산
-                    let price = 0, sale_ratio = 0, saled_price = 0;
+                    let price = products[i].original_price, sale_ratio = 0, saled_price = 0;
                     // 100원 딜 이벤트 상품인 경우
-                    if (products[i].one_hundred_deal_event) {
-                        price = products[i].price; sale_ratio = 0.99; saled_price = 100;
-                    } else { 
-                        // 기본 할인 적용
-                        if (products[i].events.length == 0) {
-                            price = products[i].price;
-                            sale_ratio = products[i].default_sale_ratio;
-                        }
-                        // 기본 할인 적용 안함
-                        else {
-                            price = products[i].original_price;
-                            for (let j = 0; j < products[i].events.length; j++) {
-                                let current_date = new Date(Date.now() + (3600000 * 9));
-                                if (products[i].events[j].start_date.getTime() <= current_date.getTime() && current_date.getTime() <= products[i].events[j].end_date.getTime())
-                                    sale_ratio += products[i].events[j].sale_ratio;
-                                if (sale_ratio >= 1) {
-                                    sale_ratio = 0.99; break;
-                                }
+                    if (products[i].one_hundred_deal_event) { sale_ratio = 0.99; saled_price = 100;} 
+                    else { 
+                        // sale_ratio 계산
+                        let current_date = new Date(Date.now() + (3600000 * 9));
+                        for (let j = 0; j < products[i].events.length; j++) {
+                            if (products[i].events[j].start_date.getTime() <= current_date.getTime() && current_date.getTime() <= products[i].events[j].end_date.getTime()) {
+                                sale_ratio += products[i].events[j].sale_ratio;
+                            }
+                            if (sale_ratio >= 1) {
+                                sale_ratio = 0.99; break;
                             }
                         }
-                        saled_price = Math.floor(price * (1 - sale_ratio));
-                        saled_price = saled_price - (saled_price % 10);
+
+                        // 기본 할인 적용 (상생 지원금 3.3%만큼 할인)
+                        if (sale_ratio == 0) {
+                            const default_sale_ratio = 0.033;
+                            price = Math.floor(price * (1 - default_sale_ratio));
+                            price = price - (price % 10);
+                            saled_price = price;
+                        }
+                        // 이벤트 할인 상품인 경우
+                        else {
+                            saled_price = Math.floor(price * (1 - sale_ratio));
+                            saled_price = saled_price - (saled_price % 10);
+                        }
                     }
-                    products[i].real_use_price = price;
-                    products[i].real_use_sale_ratio = sale_ratio;
-                    products[i].real_use_saled_price = saled_price;
+                    products[i].price = price;
+                    products[i].sale_ratio = sale_ratio;
+                    products[i].saled_price = saled_price;
                 }
                 return products;
             }
@@ -85,7 +88,7 @@ router.get('/', async (req, res) => {
             let sort_low_price = async(products, offset, count) => {
                 // 가격을 기준으로 오름차순 정렬
                 products.sort(function (a, b) {
-                    return a.real_use_saled_price - b.real_use_saled_price;
+                    return a.saled_price - b.saled_price;
                 })
                 return products.slice(offset, offset + count);
             }
@@ -94,7 +97,7 @@ router.get('/', async (req, res) => {
             let sort_high_price = async(products, offset, count) => {
                 // 가격을 기준으로 내림차순 정렬
                 products.sort(function (a, b) {
-                    return b.real_use_saled_price - a.real_use_saled_price;
+                    return b.saled_price - a.saled_price;
                 })
                 return products.slice(offset, offset + count);
             }
@@ -134,16 +137,16 @@ router.get('/', async (req, res) => {
                 // 검색 키워드가 존재할 경우 키워드가 포함된 모든 상품 리스트 출력
                 if (keyword && !category_idx) {
                     products = await Product.find({ $or: [{ name: { $regex: keyword } }, { detail_name: { $regex: keyword } }, { hashtag: { $regex: keyword } }], 
-                                                    partner_idx: partner_idx, enabled: true }).select({ _id: 1, img: 1, detail_name: 1, standard: 1, original_price: 1, price: 1, default_sale_ratio: 1, one_hundred_deal_event: 1, events: 1, is_adult: 1, like_count: 1, saled_count: 1 }).sort({ created_at: -1 });
+                                                    partner_idx: partner_idx, enabled: true }).select({ _id: 1, img: 1, detail_name: 1, standard: 1, original_price: 1, one_hundred_deal_event: 1, events: 1, is_adult: 1, like_count: 1, saled_count: 1 }).sort({ created_at: -1 });
                 }
                 // 카테고리가 설정된 경우 카테고리를 기준으로 검색된 모든 상품 리스트 출력
                 else if (!keyword && category_idx) {
-                    products = await Product.find({ category_idx: category_idx, partner_idx: partner_idx, enabled: true }).select({ _id: 1, img: 1, detail_name: 1, standard: 1, original_price: 1, price: 1, default_sale_ratio: 1, one_hundred_deal_event: 1, events: 1, is_adult: 1, like_count: 1, saled_count: 1 }).sort({ created_at: -1 });
+                    products = await Product.find({ category_idx: category_idx, partner_idx: partner_idx, enabled: true }).select({ _id: 1, img: 1, detail_name: 1, standard: 1, original_price: 1, one_hundred_deal_event: 1, events: 1, is_adult: 1, like_count: 1, saled_count: 1 }).sort({ created_at: -1 });
                 }
                 // 검색 키워드와 카테고리가 모두 설정된 경우
                 else {
                     products = await Product.find({ $or: [{ name: { $regex: keyword } }, { detail_name: { $regex: keyword } }, { hashtag: { $regex: keyword } }],
-                                                    category_idx: category_idx, partner_idx: partner_idx, enabled: true }).select({ _id: 1, img: 1, detail_name: 1, standard: 1, original_price: 1, price: 1, default_sale_ratio: 1, one_hundred_deal_event: 1, events: 1, is_adult: 1, like_count: 1, saled_count: 1 }).sort({ created_at: -1 });
+                                                    category_idx: category_idx, partner_idx: partner_idx, enabled: true }).select({ _id: 1, img: 1, detail_name: 1, standard: 1, original_price: 1, one_hundred_deal_event: 1, events: 1, is_adult: 1, like_count: 1, saled_count: 1 }).sort({ created_at: -1 });
                 }
     
                 // product collection의 검색 결과가 없을 경우 error 메시지 출력
@@ -166,9 +169,9 @@ router.get('/', async (req, res) => {
                             like: sorted_products[i].like_count,
                             detail_name: sorted_products[i].detail_name,
                             standard: (sorted_products[i].standard == "0") ? "-" : sorted_products[i].standard,
-                            price: sorted_products[i].real_use_price,
-                            sale_ratio: Math.floor(sorted_products[i].real_use_sale_ratio * 100),
-                            saled_price: sorted_products[i].real_use_saled_price,
+                            price: sorted_products[i].price,
+                            sale_ratio: Math.floor(sorted_products[i].sale_ratio * 100),
+                            saled_price: sorted_products[i].saled_price,
                             is_adult: sorted_products[i].is_adult,
                             one_hundred_deal_event: sorted_products[i].one_hundred_deal_event
                         }
@@ -200,30 +203,33 @@ router.get('/:product_idx', async (req, res) => {
                 res.status(200).json(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_PRODUCT));
             } else {
                 // 가격 계산
-                let price = 0, sale_ratio = 0, saled_price = 0;
+                let price = product[0].original_price, sale_ratio = 0, saled_price = 0;
                 // 100원 딜 이벤트 상품인 경우
-                if (product[0].one_hundred_deal_event) {
-                    price = product[0].price; sale_ratio = 0.99; saled_price = 100;
-                } else { 
-                    // 기본 할인 적용
-                    if (product[0].events.length == 0) {
-                        price = product[0].price;
-                        sale_ratio = product[0].default_sale_ratio;
-                    }
-                    // 기본 할인 적용 안함
-                    else {
-                        price = product[0].original_price;
-                        for (let i = 0; i < product[0].events.length; i++) {
-                            let current_date = new Date(Date.now() + (3600000 * 9));
-                            if (product[0].events[i].start_date.getTime() <= current_date.getTime() && current_date.getTime() <= product[0].events[i].end_date.getTime())
-                                sale_ratio += product[0].events[i].sale_ratio;
-                            if (sale_ratio >= 1) {
-                                sale_ratio = 0.99; break;
-                            }
+                if (product[0].one_hundred_deal_event) { sale_ratio = 0.99; saled_price = 100;} 
+                else { 
+                    // sale_ratio 계산
+                    let current_date = new Date(Date.now() + (3600000 * 9));
+                    for (let i = 0; i < product[0].events.length; i++) {
+                        if (product[0].events[i].start_date.getTime() <= current_date.getTime() && current_date.getTime() <= product[0].events[i].end_date.getTime()) {
+                            sale_ratio += product[0].events[i].sale_ratio;
+                        }
+                        if (sale_ratio >= 1) {
+                            sale_ratio = 0.99; break;
                         }
                     }
-                    saled_price = Math.floor(price * (1 - sale_ratio));
-                    saled_price = saled_price - (saled_price % 10);
+
+                    // 기본 할인 적용 (상생 지원금 3.3%만큼 할인)
+                    if (sale_ratio == 0) {
+                        const default_sale_ratio = 0.033;
+                        price = Math.floor(price * (1 - default_sale_ratio));
+                        price = price - (price % 10);
+                        saled_price = price;
+                    }
+                    // 이벤트 할인 상품인 경우
+                    else {
+                        saled_price = Math.floor(price * (1 - sale_ratio));
+                        saled_price = saled_price - (saled_price % 10);
+                    }
                 }
 
                 data = {
