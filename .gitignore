@@ -265,6 +265,7 @@ typings/
 .history
 
 # End of https://www.gitignore.io/api/node,macos,visualstudiocode
+bin/
 config/
 .env
 node_modules/
