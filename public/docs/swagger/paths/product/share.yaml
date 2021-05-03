@@ -1,0 +1,25 @@
+put:
+  tags:
+    - 상품
+  summary: 상품 공유 횟수 증가 
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            product_idx:
+              type: string
+              description: 상품 고유id
+          require:
+            - product_idx
+          example:
+            product_idx: '5f27a1ef371aad178caf5e29'
+  responses:
+    '200':
+      $ref: '../../components/responses.yaml#200-UPDATE_SUCCESS'
+    '400      ':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

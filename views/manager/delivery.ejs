@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>큐마켓 관리자</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+        table {
+            width: 100%;
+        }
+        img {
+            width: 75px;
+            height: 75px;
+        }
+        table, tr, td, th {
+            border-collapse: collapse;
+        }
+        th {
+            background-color: #F0F0F0;
+        }
+        th {
+            padding: 10px 0px;
+        }
+        td {
+            padding: 10px 2px;
+            text-align: center;
+        }
+        tbody tr {
+            border-bottom: 1px solid #F0F0F0;
+        }
+        .page_num {
+            width : 99.5%;
+	    position : relative;
+	    bottom : 0;
+        }
+        .page_num, a {  
+            text-align: center;
+            text-decoration: none;
+        }
+        .a_other_page {
+            color: #646464;
+		}
+        .a_current_page {
+            font-size: 150%;
+            color: black;
+            pointer-events: none;
+		}
+
+        @media screen and (max-width: 768px) {
+            * {
+                font-size: 0.9em;
+            }
+            td:nth-child(4) {
+                width: 100px;
+            }
+        }
+        .hidden {
+            display: none;
+        }
+        .expandable:hover {
+            background-color: #FAFAFA;
+        }
+        
+        .important {
+            background: #FFFFAA;
+        }
+    </style>
+</head>
+
+<body>
+    <script>
+        function expand(e) {
+            if(e.nextElementSibling.classList.contains("hidden")) {
+                e.nextElementSibling.classList.remove("hidden");
+            } else e.nextElementSibling.classList.add("hidden");
+        }
+    </script>
+    <h1>상품 배송
+        <span style="font-size: 12px; color: #E7713F;">*클릭 시 상세 정보를 확인할 수 있습니다.</span>
+    </h1>
+    <table>
+        <tbody>
+            <tr>
+                <td style="width : 5%">
+                    <input type="button" value="전체선택" onclick="boxes_check()"></button>
+                </td>
+                <td style="width : 95%">
+                </td>
+                <td>
+                    <input type="button" value="배송시작" onclick="start('<%= JSON.stringify(data) %>')"></button>
+                </td>
+                <td>
+                    <input type="button" value="배송완료" onclick="finish('<%= JSON.stringify(data) %>')"></button>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <table>
+        <thead>
+            <tr>
+                <th style="width : 4%"></th>
+                <th>
+                    주문날짜
+                </th>
+                <th>
+                    수령인
+                </th>
+                <th>
+                    전화번호
+                </th>
+                <th>
+                    배송주소
+                </th>
+                <th>
+                    배송여부
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            
+            <%
+            const offset = new Date().getTimezoneOffset() * 60000; 
+            for(let i = 0; i < data.order_requests.length; i++) { %>
+            <% if(data.order_requests[i].status == 200 || data.order_requests[i].status == 300) { %>
+            <tr class="expandable important" onclick="expand(this)">
+            <% } else { %>
+            <tr class="expandable" onclick="expand(this)">
+            <% } %>
+                <td style="width : 5%">
+                    <input name="target_box" type="checkbox" onclick="event.cancelBubble=true">
+                </td>
+                <td>
+                    <%= data.order_requests[i].order_date %>
+                </td>
+                <td>
+                    <%= data.order_requests[i].receiver %>
+                </td>
+                <td>
+                    <%= data.order_requests[i].phone %>
+                </td>
+                <td>
+                    <%= data.order_requests[i].address %>
+                </td>
+                <%if(data.order_requests[i].status === 200){
+                    var is_delivery = '배송대기'
+                }else if(data.order_requests[i].status === 300){
+                    var is_delivery = '배송중'
+                }else if(data.order_requests[i].status === 400){
+                    var is_delivery = '배송완료'
+                }else{
+                    var is_delivery = '오류'
+                }%>
+                <td><%= is_delivery %></td>
+            </tr>
+            <tr class="hidden">
+                <td colspan="5" style="margin: 0; padding: 0;">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>
+                                    배송메모
+                                </th>
+                                <th>
+                                    현관 비밀번호
+                                </th>
+                                <th>
+                                    주문 상품
+                                </th>
+                            </tr>
+                        </thead>
+                        <tbody class="product_list">
+                            <tr>
+                                <td>
+                                    <%= data.order_requests[i].delivery_memo %>
+                                </td>
+                                <td>
+                                    <%= data.order_requests[i].home_pwd %>
+                                </td>
+                                <td>
+                                    <table>
+                                        <% for(var j = 0; j < data.order_requests[i].product.length; j++){ %>
+                                        <tr>
+                                            <td>
+                                                <%=data.order_requests[i].product[j].name%>
+                                            </td>
+                                            <td>
+                                                <%=data.order_requests[i].product[j].count%>개
+                                            </td>
+                                        </tr>
+                                        <% } %>
+                                    </table>
+                                </td>
+                                <td></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </td>
+            </tr>
+            <% } %>
+        </tbody>
+    </table>
+    <!-- 페이지 넘기기, move 추가 필요 -->
+    <div class = "page_num">
+     <% var current_page = data.current_page_num;
+        var last_page = data.last_page_num;
+        if(current_page < 6){
+            if(last_page < 10){
+                for(let i = 1; i <= last_page; i++){
+                    if(i == current_page){ %>
+                        <a href="#" class = "a_current_page" onclick="move_page('<%= data.partner_idx %>', this)">
+                            <%= i %>
+                        </a>
+     <%             } else { %>
+                        <a href="#" class = "a_other_page" onclick="move_page('<%= data.partner_idx %>', this)">
+                            <%= i %>
+                        </a>
+     <%             }
+                }
+            } else {
+                for(let i = 1; i <= 10; i++){ 
+                    if(i == current_page){ %>
+                        <a href="#" class = "a_current_page" onclick="move_page('<%= data.partner_idx %>', this)">
+                            <%= i %>
+                        </a>
+     <%             } else { %>
+                        <a href="#" class = "a_other_page" onclick="move_page('<%= data.partner_idx %>', this)">
+                            <%= i %>
+                        </a>
+     <%             }
+                }
+            }
+        } else if(last_page - current_page < 4){
+            for(let i = 0; i < 10; i++){
+                if(last_page - 9 + i < 1){}
+                else { 
+                    if(last_page - 9 + i == current_page){ %>
+                        <a href="#" class = "a_current_page" onclick="move_page('<%= data.partner_idx %>', this)">
+                            <%= last_page - 9 + i %>
+                        </a>
+     <%             } else { %>
+                        <a href="#" class = "a_other_page" onclick="move_page('<%= data.partner_idx %>', this)">
+                            <%= last_page - 9 + i %>
+                        </a>
+     <%             }
+                }
+            }
+        } else {
+            for(let i = 0; i < 10; i++){
+                if(current_page - 5 + i == current_page){ %>
+                    <a href="#" class = "a_current_page" onclick="move_page('<%= data.partner_idx %>', this)">
+                        <%= current_page - 5 + i %>
+                    </a>
+     <%         } else { %>
+                    <a href="#" class = "a_other_page" onclick="move_page('<%= data.partner_idx %>', this)">
+                        <%= current_page - 5 + i %>
+                    </a>
+     <%         }
+            }
+        } %>
+    </div>
+    <script>
+        function boxes_check(){
+            let checked = false;
+            var boxes = document.getElementsByName("target_box");
+            //목록이 비어 있는 경우
+            if(boxes.length == 0){}
+            else{
+                for(let i = 0; i < boxes.length; i++){
+                    if(boxes[i].checked){
+                        console.log(i);
+                    } else {
+                        boxes[i].checked = true;
+                        checked = true;
+                    }
+                }
+                if(!checked){
+                    for(let i = 0; i < boxes.length; i++){
+                        boxes[i].checked = false;
+                    }
+                }
+            }
+        }
+        function start(i) {
+            var data = JSON.parse(i);
+            let change_orders = [];
+            let change_data = [];
+
+            var boxes = document.getElementsByName("target_box");
+            //주문 목록 없는 경우
+            if(boxes.length == 0){}
+            else {
+                //체크된 주문 건 영수증 프린트 및 '주문요청' -> '배송대기' order 정리 
+                for(let i = 0; i < boxes.length; i++){
+                    if(boxes[i].checked){
+                        change_orders.push(i);
+                    }
+                }
+                //체크된 박스가 없을 경우
+                if(change_orders.length == 0){}
+                else{
+                    let check = true;
+                    for(let i = 0; i < change_orders.length; i++){
+                        if(data.order_requests[change_orders[i]].status == 300 || data.order_requests[change_orders[i]].status == 400){
+                            check = false;
+                        }
+                    }
+                    if(check){
+                        for(let i = 0; i < change_orders.length; i++){
+                            console.log(data.order_requests[change_orders[i]].order_id);
+                            change_data.push(data.order_requests[change_orders[i]].order_id);
+                        }
+
+                        var xhttp = new XMLHttpRequest()
+                        var requestBody ={
+                            order_id : change_data,
+                            change_status : '300',
+                        }
+                        var URL = "/manager/order/status"  
+                        xhttp.onreadystatechange = function () {
+                            if (this.readyState == 4 && this.status == 200) {
+                                alert('배송상태가 정상적으로 변경되었습니다!')
+                                window.location.reload();
+                            }
+                        }
+                        xhttp.open("PUT", URL)
+                        xhttp.setRequestHeader('Content-Type', 'application/json')
+                        xhttp.send(JSON.stringify(requestBody))
+                    }
+                    //다른 상태의 배송건이 선택된 경우
+                    else{
+                        alert('배송대기 상태가 아닌 배송건이 포함되어 있습니다.')
+                        window.location.reload();
+                    }
+                }
+            }
+        }
+        function finish(i) {
+            var data = JSON.parse(i);
+            let change_orders = [];
+            let change_data = [];
+
+            var boxes = document.getElementsByName("target_box");
+            //주문 목록 없는 경우
+            if(boxes.length == 0){}
+            else {
+                //체크된 주문 건 영수증 프린트 및 '주문요청' -> '배송대기' order 정리 
+                for(let i = 0; i < boxes.length; i++){
+                    if(boxes[i].checked){
+                        change_orders.push(i);
+                    }
+                }
+                //체크된 박스가 없을 경우
+                if(change_orders.length == 0){}
+                else{
+                    let check = true;
+                    for(let i = 0; i < change_orders.length; i++){
+                        if(data.order_requests[change_orders[i]].status == 200 || data.order_requests[change_orders[i]].status == 400){
+                            check = false;
+                        }
+                    }
+                    if(check){
+                        for(let i = 0; i < change_orders.length; i++){
+                            console.log(data.order_requests[change_orders[i]].order_id);
+                            change_data.push(data.order_requests[change_orders[i]].order_id);
+                        }
+
+                        var xhttp = new XMLHttpRequest()
+                        var requestBody ={
+                            order_id : change_data,
+                            change_status : '400',
+                        }
+                        var URL = "/manager/order/status"  
+                        xhttp.onreadystatechange = function () {
+                            if (this.readyState == 4 && this.status == 200) {
+                                alert('배송상태가 정상적으로 변경되었습니다!')
+                                window.location.reload();
+                            }
+                        }
+                        xhttp.open("PUT", URL)
+                        xhttp.setRequestHeader('Content-Type', 'application/json')
+                        xhttp.send(JSON.stringify(requestBody))
+                    }
+                    //다른 상태의 배송건이 선택된 경우
+                    else{
+                        alert('배송대기 상태가 아닌 배송건이 포함되어 있습니다.')
+                        window.location.reload();
+                    }
+                }
+            }
+        }
+
+        function move_page(partner_id, a_tag){
+            var num = a_tag.text.replace(/(\s*)/g, "");
+            var URL = "/manager/" + p_idx + "/delivery?page=" + num;
+            console.log(URL);
+            var xhttp = new XMLHttpRequest();
+            xhttp.onreadystatechange = function() {
+                if(this.readyState == 4 && this.status == 200) {
+                    window.location.href = xhttp.responseURL;
+                }
+            }
+            xhttp.open("GET", URL);
+            xhttp.setRequestHeader("Content-Type", "application/json");
+            xhttp.send();
+        }
+    </script>
+</body>
+
+</html>

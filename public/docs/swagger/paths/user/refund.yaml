@@ -1,0 +1,87 @@
+post:
+  tags:
+    - 유저 관련 정보 API version 2 (마이페이지)
+  summary: 상품 환불 요청하기
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+  requestBody:
+    require: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            order_id:
+              type: string
+              description: 주문 고유번호
+              required: true
+            product:
+              type: array
+              description: 환불 상품 정보 (product_idx, count, price)
+              items:
+                type: object
+                properties:
+                  product_idx:
+                    type: string
+                    description: 환불 상품 고유id
+                  count:
+                    type: integer
+                    description: 환불 상품 수량
+                  price:
+                    type: integer
+                    description: 상품 가격(수량 * 상품 1개당 가격)
+              required: true
+            amount:
+              type: integer
+              description: 환불 총 요청 금액
+              required: true
+            content:
+              type: string
+              description: 환불 사유
+              required: true
+            is_delivery:
+              type: integer
+              description: 배송상태 (1(배송전) or 3(배송완료)만 입력 가능)
+              required: true
+            img:
+              type: string
+              description: 환불 이미지 (is_delivery가 3(배송완료)일 경우 꼭 입력)
+            is_all:
+              type: integer
+              description: 전체환불 여부(0(부분환불) 1(전체환불))
+              required: true
+          example:
+            order_id: "mid_1614928156760"
+            product:
+              [
+                {
+                  "product_idx": "6041df65c1551891db13444d",
+                  "count": 1,
+                  "price": 960
+                },
+                {
+                  "product_idx": "6041e001c1551891db1344ee",
+                  "count": 1,
+                  "price": 300
+                }
+              ]
+            amount: 1260
+            content: "상했어요!"
+            is_delivery: 3
+            img: "refund_image.jpg"
+            is_all: 1
+
+  responses:
+    '200': 
+      $ref: '../../components/responses.yaml#200-REFUND_REQUEST_SUCCESS'
+    '400':
+      $ref: '../../components/responses.yaml#400-REFUND_REQUEST_FAIL'
+    '400 ':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

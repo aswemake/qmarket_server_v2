@@ -1,0 +1,43 @@
+get:
+  tags:
+    - 유저 관련 정보 API version 2 (마이페이지)
+  summary: 유저 정보 조회
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  responses:
+    '200':
+      description: 유저 정보 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 조회 성공'
+              data:
+                type: object
+                example: 
+                  {
+                    "user_idx": 20,
+                    "name": "손수영",
+                    "email": "powe0112@naver.com",
+                    "profile_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/기본프로필사진.png",
+                    "qmoney": 749
+                  }
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

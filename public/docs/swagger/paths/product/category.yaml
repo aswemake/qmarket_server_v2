@@ -1,0 +1,63 @@
+get:
+  tags:
+    - 상품
+  summary: 상품 상세 정보
+  parameters:
+    - in: query
+      name: category_idx
+      schema:
+        type: string
+      description: |
+        카테고리 고유id
+    - in: query
+      name: sort
+      schema:
+        type: integer
+      description: |
+        상품 정렬번호(1:판매순, 2:인기순, 3:낮은가격순, 4:높은가격순, 5:많은리뷰순, 6:최신순 )
+
+  responses:
+    '200':
+      description: 상품 데이터 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 조회 성공'
+              data:
+                type: object
+                example: [{
+                    "product_idx": "5e2817f0fe5f9a36acaef78a",
+                    "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/sparkle1.png",
+                    "detail_name": "스파클2L*6개입",
+                    "sale_ratio": 0.5,
+                    "price": 6000,
+                    "saled_price": 3000,
+                    "like": 0,
+                    "is_adult": false
+                },
+                {
+                    "product_idx": "5ee701c547f4f60e2ccd7fbb",
+                    "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/혼술키트.png",
+                    "detail_name": "혼밥은 맛있어",
+                    "sale_ratio": 0.2,
+                    "price": 15000,
+                    "saled_price": 12000,
+                    "like": 1,
+                    "is_adult": false
+                }]
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '400  ':
+      $ref: '../../components/responses.yaml#400-NULL_PRODUCT'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

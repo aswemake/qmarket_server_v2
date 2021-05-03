@@ -1,0 +1,55 @@
+delete:
+  tags:
+    - 유저 관련 정보 API version 2 (마이페이지)
+  summary: 유저 리뷰 삭제
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            coupon_idx:
+              type: string
+              description: 쿠폰 고유번호
+          require:
+            - review_idx
+          example:
+            review_idx: '6035f1ccf5bd68cfe18a0aea'
+
+  responses:
+    '200':
+      description: 유저 리뷰 삭제 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 삭제 성공'
+              data:
+                type: object
+                example: 
+                  {
+                    "status": 200,
+                    "success": true,
+                    "message": "데이터 삭제 성공"
+                  }
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

@@ -1,0 +1,47 @@
+get:
+  tags:
+    - 상품
+  summary: 이벤트 상품 구매 여부 검사
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+    - in: query
+      name: product_idx
+      schema:
+        type: string
+      description: |
+        상품 고유id
+
+  responses:
+    '200':
+      description: "purchased: true일 경우 상품 구매 불가 / count: 실제 상품 수량"
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 조회 성공'
+              data:
+                type: object
+                example: {
+                  "purchased": true,
+                  "count": 14
+                }
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '400  ':
+      $ref: '../../components/responses.yaml#400-NULL_PRODUCT'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

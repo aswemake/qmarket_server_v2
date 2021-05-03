@@ -1,0 +1,61 @@
+get:
+  tags:
+    - 상품API version 2
+  summary: 상품 리뷰 리스트 조회
+  parameters:
+    - in: path
+      name: product_idx
+      schema:
+        type: string
+      description: |
+        상품 고유번호
+      required: true
+    - in: query
+      name: sort
+      schema:
+        type: string
+      description: |
+        정렬 (인기순, 최신순)
+      required: true
+
+  responses:
+    '200':
+      description: 리뷰 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 조회 성공'
+              data:
+                type: array
+                example: [
+                  {
+                    "review_idx": "602cd7127aa8855e3cdf6080",
+                    "name": "이의석",
+                    "content": "DSFSDF",
+                    "score": 3,
+                    "like": 0,
+                    "created_at": "2021-02-17T17:42:58.376Z"
+                  },
+                  {
+                    "review_idx": "602cd45ff5bd68cfe1865b91",
+                    "name": "이승규",
+                    "content": "기대됩니다!",
+                    "score": 0,
+                    "like": 0,
+                    "created_at": "2020-08-23T15:49:14.386Z"
+                  }
+                ]
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

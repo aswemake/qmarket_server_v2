@@ -1,0 +1,75 @@
+get:
+  tags:
+    - 유저 관련 정보 API version 2 (마이페이지)
+  summary: 주문 상세 조회
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+    - in: path
+      name: order_id
+      schema:
+        type: string
+      description: |
+        주문 고유번호
+      required: true
+
+  responses:
+    '200':
+      description: 주문 상세 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 조회 성공'
+              data:
+                type: array
+                example: 
+                  {
+                    "order_id": "mid_1607262130540",
+                    "buyer_name": "손수영",
+                    "order_date": "2020-12-06T13:42:36.000Z",
+                    "order_product": 
+                      [
+                        {
+                          "product_idx": "5f27a1f3371aad178caf5ebe",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+1인+가구용+몽베스트+1L+x+6.jpg",
+                          "name": "몽베스트",
+                          "detail_name": "1인 가구용 몽베스트 1L x 6",
+                          "price": 11000,
+                          "count": 4
+                        }
+                      ],
+                    "is_delivery": 4,
+                    "price": 11000,
+                    "delivery_price": 0,
+                    "coupon_price": 0,
+                    "qmoney": 0,
+                    "amount": 11000,
+                    "pay_method": "카카오페이",
+                    "buyer_info": 
+                      {
+                        "receiver": "손수영",
+                        "phone": "01065329657",
+                        "mail_number": null,
+                        "address": "인천광역시 미추홀구 재넘이길 147-17",
+                        "detail_address": "문화네트빌 202동 403호",
+                        "delivery_memo": "가져가유"
+                      }
+                  }
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

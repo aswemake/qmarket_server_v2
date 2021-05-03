@@ -1,0 +1,54 @@
+get:
+  tags:
+    - 결제
+  summary: 결제 유저 정보 조회
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+  responses:
+    '200':
+      description: 유저 데이터 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: 데이터 조회 성공
+              data:
+                type: object
+                example: {
+                  "user_idx": "2",
+                  "name": "고성진",
+                  "phone": 01048302250,
+                  "email": "w8348@naver.com",
+                  "mail_number": 43260,
+                  "address": "인천광역시 남구 용현동 11-11",
+                  "detail_address": "100동 102호",
+                  "delivery_memo": "문 앞에 놔주세요",
+                  "save_money": 0,
+                  "coupon":{
+                    coupon_idx: "5e44f935a881803990beb03c",
+                    name: "회원가입 환영쿠폰",
+                    sale_price: 1000,
+                    limit_price: 15000,
+                    limit_date: "2020-02-14T15:00:00.000+00:00"
+                  }
+                }
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '400 ':
+      $ref: '../../components/responses.yaml#400-WRONG_PARAMS'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

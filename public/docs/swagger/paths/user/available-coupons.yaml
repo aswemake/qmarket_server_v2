@@ -1,0 +1,60 @@
+get:
+  tags:
+    - 유저 관련 정보 API version 2 (마이페이지)
+  summary: 유저가 사용할 수 있는 쿠폰 리스트 조회
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  responses:
+    '200':
+      description: 유저가 사용할 수 있는 쿠폰 리스트 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 조회 성공'
+              data:
+                type: object
+                example: 
+                  {
+                    "count": 2,
+                    "coupons": 
+                      [
+                        {
+                          "coupon_idx": "6035ecd8f5bd68cfe18a0733",
+                          "name": "쿠폰이름",
+                          "sale_price": 200,
+                          "limit_price": 10,
+                          "limit_date": "2021-03-31T00:00:00.000Z",
+                          "coupon_type": 3,
+                          "is_used": false
+                        },
+                        {
+                          "coupon_idx": "6035f1ccf5bd68cfe18a0aea",
+                          "name": "쿠폰이름2222",
+                          "sale_price": 1000,
+                          "limit_price": 10,
+                          "limit_date": "2021-04-30T00:00:00.000Z",
+                          "coupon_type": 3,
+                          "is_used": false
+                        }
+                      ]
+                  }
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

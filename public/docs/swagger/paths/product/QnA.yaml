@@ -1,0 +1,106 @@
+get:
+  tags:
+    - 상품
+  summary: 상품 QnA 보기
+  parameters:
+    - in: query
+      name: product_idx
+      schema:
+        type: string
+      description: |
+        상품 고유id
+
+  responses:
+    '200':
+      description: QnA 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: 'QnA 조회 성공'
+              data:
+                type: object
+                example: [{
+                  "question_idx": "2019183132na019283",
+                  "name": "류지원님",
+                  "content": "맥주는 따로 비용을 내고 먹어야 하나요?",
+                  "created_at": "2020-01-09T13:00:00",
+                  "is_answered": true,
+                  "answer": [{
+                    "answer_idx": "2019183132na019283",
+                    "name" : "스파클님",
+                    "content": "저희 스파클을 이용해주셔서 감사합니다!",
+                    "created_at": "2020-01-09T13:00:00"
+                  }]
+                },
+                {
+                  "question_idx": "2019183132na019283",
+                  "name": "류지원님",
+                  "content": "맥주는 따로 비용을 내고 먹어야 하나요?",
+                  "created_at": "2020-01-09T13:00:00",
+                  "is_answered": false,
+                  "answer": []
+                },
+                ...,
+                ]
+
+                
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'
+
+post:
+  tags:
+    - 상품
+  summary: 상품 QnA 작성
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+    - in: query
+      name: product_idx
+      schema:
+        type: string
+      description: |
+        상품 고유id
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            category:
+              type: string
+              description: 질문 카테고리
+            content:
+              type: string
+              description: 질문 내용
+          require:
+            - category
+            - content
+          example:
+            category: '질문 종류를 선택해 주세요'
+            content: '물맛이 너무 좋아요!'
+  responses:
+    '201':
+      $ref: '../../components/responses.yaml#201-SAVE_SUCCESS'
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '400 ':
+      $ref: '../../components/responses.yaml#400-WRONG_PARAMS'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

@@ -1,0 +1,75 @@
+get:
+  tags:
+    - 마이페이지
+  summary: 결제 상세 정보
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+    - in: query
+      name: order_id
+      schema:
+        type: string
+      description: |
+        결제 고유번호
+
+  responses:
+    '200':
+      description: 상품 결제 데이터 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '상품 결제 데이터 조회 성공'
+              data:
+                type: object
+                example: {
+                  "order_id": "mid_1583121864881",
+                  "buyer_name": "고성진",
+                  "order_date": "2020-02-02T13:00",
+                  "order_product": [{
+                    main_img: "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/sparkle1.png",
+                    name: "스파클",
+                    detail_name: "스파클2L*6개입",
+                    price: 3500,
+                    count: 3
+                  },
+                  {
+                    main_img: "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/sparkle1.png",
+                    name: "스파클",
+                    detail_name: "스파클2L*6개입",
+                    price: 3500,
+                    count: 3
+                  }],
+                  "is_delivery": 1,
+                  "price": 7000,
+                  "delivery_price": 1000,
+                  "coupon_price": 1000,
+                  "qmoney": 0,
+                  "amount": 6000,
+                  "pay_method": "card",
+                  "buyer_info": {
+                    receiver: "고성진",
+                    phone: "01048302250",
+                    mail_number: 22140,
+                    address: "인천 미추홀구 용현동 177-9 패밀리고시원",
+                    detail_address: "102호",
+                    delivery_memo: "배송 전 연락 바랍니다."
+                  }
+                }
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

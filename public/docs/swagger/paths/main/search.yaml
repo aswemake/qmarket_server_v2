@@ -1,0 +1,115 @@
+get:
+  tags:
+    - 메인페이지
+  summary: 상품 및 반상회 검색
+  parameters:
+    - in: query
+      name: latitude
+      required: true
+      schema:
+        type: string
+      description: |
+        사용자 위치(위도)
+
+    - in: query
+      name: longitude
+      required: true
+      schema:
+        type: string
+      description: |
+        사용자 위치(경도)
+
+    - in: query
+      name: sido
+      required: true
+      schema:
+        type: string
+      description: |
+        사용자 위치(시 단위)
+
+    - in: query
+      name: sigungu
+      required: true
+      schema:
+        type: string
+      description: |
+        사용자 위치(구 단위)
+        
+    - in: query
+      name: search
+      schema:
+        type: string
+      description: |
+        반상회 해시태그 단어 및 검색어
+
+  responses:
+    '200':
+      description: 데이터 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 조회 성공'
+              data:
+                type: object
+                example: {
+                  "party": [{
+                    "party_idx": "ab_1027492",
+                    "main_img": "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf",
+                    "name": "맥주의 A to Z",
+                    "location": "안암아줌마치킨",
+                    "left_date": 10,
+                    "is_finished": true,
+                    "like": 3
+                  },
+                  {
+                    "party_idx": "ab_1027492",
+                    "main_img": "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf",
+                    "name": "맥주의 A to Z",
+                    "location": "안암아줌마치킨",
+                    "left_date": 10,
+                    "is_finished": true,
+                    "like": 3
+                  }],
+                  "product": [{
+                    "product_idx": "ab_1027492",
+                    "main_img": "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf",
+                    "detail_name": "스파클 2L6개입",
+                    "price": 3000,
+                    "sale_ratio": 50,
+                    "saled_price": 1500,
+                    "is_adult": false,
+                    "like": 3
+                  },
+                  {
+                    "product_idx": "ab_1027492",
+                    "main_img": "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf",
+                    "price": 3000,
+                    "sale_ratio": 50,
+                    "saled_price": 1500,
+                    "is_adult": false,
+                    "like": 3
+                  },
+                  {
+                    "product_idx": "ab_1027492",
+                    "main_img": "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf",
+                    "price": 3000,
+                    "sale_ratio": 50,
+                    "saled_price": 1500,
+                    "is_adult": false,
+                    "like": 3
+                  }]
+                }
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

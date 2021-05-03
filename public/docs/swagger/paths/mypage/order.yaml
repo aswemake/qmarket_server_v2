@@ -1,0 +1,53 @@
+get:
+  tags:
+    - 마이페이지
+  summary: 주문 내역
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  responses:
+    '200':
+      description: 주문 데이터 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: 데이터 조회 성공
+              data:
+                type: array
+                example: [
+                  {
+                    "order_id": "2ef1jkl3ija4jkl",
+                    "order_date": "2020-02-02T13:00",
+                    "main_img": "https://sparkle.com",
+                    "name": "스파클 2L*6개입 외 2개",
+                    "price": 10000,
+                    "is_delivery": 1
+                  },
+                  {
+                    "order_id": "2ef1jkl3ija4jkl",
+                    "order_date": "2020-02-02T13:00",
+                    "main_img": "https://sparkle.com",
+                    "name": "스파클 2L*6개입",
+                    "price": 3500,
+                    "is_delivery": 1
+                  },
+                    ...
+                  ]
+                
+    '500':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <title>큐마켓 관리자</title>
+</head>
+
+<body>
+    <div style=" display:flex; flex:1; align-content: center;">
+        <!--<input 
+            style="background-color: #E7713F; color: white; border:none; padding:20px; margin-right: 10px; font-size: larger;" 
+            type="button" 
+            value="낱개 등록" 
+	    onclick="move_enroll('/manager/<%= partner_idx %>/enroll', this)"/>-->
+        <input 
+            style="background-color: #E7713F; color: white; border:none; padding:20px;  font-size: larger;" 
+            type="button" 
+            value="일괄 등록" 
+            onclick="move_enroll('/manager/<%= partner_idx %>/enroll_excel', this)"/>
+    </div>
+    <article>
+        <iframe style="border: none; display:flex; flex:1; width: 100%; height:1000px" id="content" src="/manager/<%= partner_idx %>/enroll_excel"></iframe>
+    </article>
+
+    <script>
+        function move_enroll(link, obj) {
+            var clicked = document.getElementsByClassName('clicked')
+            if(clicked.length != 0) {
+                clicked[0].classList.remove('clicked');
+                // for(let i=0;i<clicked.length; i++) {
+                //     console.log(clicked[0]);
+                // }
+                // clicked.map(value => value.classList.remove('clicked'));
+            }
+            document.getElementById('content').src = link;
+            obj.classList.add('clicked');
+        }
+    </script>
+</body>
+
+</html>

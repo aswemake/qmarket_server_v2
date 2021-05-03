@@ -1,0 +1,58 @@
+get:
+  tags:
+    - 반상회
+  summary: 반상회 피드 상세정보
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+    - in: query
+      name: feed_idx
+      schema:
+        type: string
+      description: |
+        반상회 피드 고유id
+
+  responses:
+    '200':
+      description: 피드 데이터 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '피드 데이터 조회 성공'
+              data:
+                type: object
+                example: {
+                  "party_name": "치킨을 피할 수 없는 이유",
+                  "leader": "김정민",
+                  "start_date": "매월 2주차 토요일",
+                  "location_name": "인하대 후문 안암 아줌마 치킨",
+                  "address": "인천 미추홀구 인하로67번길 6-19",
+                  "like": 3,
+                  "shared_count": 1,
+                  "img": [
+                    "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf",
+                    "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf",
+                    "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf"
+                  ],
+                  "created_at": "2020-02-02T13:00",
+                  "name": "12월 15일 첫 모임 진행",
+                  "content": "총 12명 전원 출석하였고, 즐거운 시간을 보냈습니다.",
+                }
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

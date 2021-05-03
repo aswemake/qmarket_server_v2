@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>큐마켓 관리자</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+
+        table {
+            width: 100%;
+        }
+
+        img {
+            width: 75px;
+            height: 75px;
+        }
+
+        table,
+        tr,
+        td,
+        th {
+            border-collapse: collapse;
+        }
+
+        thead {
+            background-color: #F0F0F0;
+        }
+
+        th {
+            padding: 10px 0px;
+        }
+
+        td {
+            padding: 10px 0px;
+            text-align: center;
+        }
+
+        tbody tr {
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .pc {
+            display: none;
+            font-size: 0.4em;
+            font-weight: normal;
+            color: red;
+        }
+
+        @media screen and (max-width: 768px) {
+            * {
+                font-size: 0.95em;
+            }
+
+            .pc {
+                display: inline;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display: flex; flex-direction: row; justify-content: space-between;">
+        <h1>상품 환불관리<span class="pc">*PC에 최적화 되어있습니다.</span></h1>
+    </div>
+    <table>
+        <thead>
+            <tr>
+                <th>
+                    환불 요청날짜
+                </th>
+                <th>
+                    주문자
+                </th>
+                <th>
+                    환불사유
+                </th>
+                <th>
+                    환불 요청 파일
+                </th>
+                <th>
+                    환불 요청 금액
+                </th>
+                <th>
+                    환불여부
+                </th>
+                <th>
+                    환불상품
+                </th>
+                <th colspan="2">
+                    기능
+                </th>
+            </tr>
+        </thead>
+        <tbody>
+            <% 
+        const offset = new Date().getTimezoneOffset() * 60000;
+        for(var i=0; i< data.length; i++) { %>
+            <tr>
+                <td><%= data[i].refund_date %></td>
+                <td><%= data[i].refunder %></td>
+                <td><%= data[i].content %></td>
+		<% if(!data[i].file) { %>
+		    <td></td>
+		<% } else { %>
+                    <td><a download href="<%= data[i].file %>">다운로드 </a></td>
+		<% } %>
+                <td><%= data[i].amount %></td>
+                <%if(data[i].status === 900 || data[i].status === 910){
+                     var is_refund = '환불 대기중'
+                }else if(data[i].status === 902 || data[i].status === 912){
+                    var is_refund = '환불 완료'
+                }else if(data[i].status === 901 || data[i].status === 911){
+                    var is_refund = '환불 거절'
+                }else{
+                    var is_refund = '오류ㅠㅠ'
+                }%>
+                <td><%= is_refund %></td>
+                <td>
+                    <table>
+                        <%
+                for(var j=0; j<data[i].product.length; j++){ %>
+                        <tr>
+                            <td>
+                                <%=data[i].product[j].product_name%>
+                            </td>
+                            <td>
+                                <%=data[i].product[j].count%>개
+                            </td>
+                            <td>
+                                <%=data[i].product[j].price%>원
+                            </td>
+                        </tr>
+                        <% } %>
+                    </table>
+                </td>
+                <td>
+                    <% if(data[i].status == 900 || data[i].status == 910) { %>
+                        <% if(data[i].is_all == 0 ){ %>
+                        <div>
+                            <input type="button" value="환불하기"
+                                onclick="refund_approve('<%= data[i].refund_id %>', '<%=data[i].order_id %>')"></button>
+                        </div>
+                        <% } else { %>
+                        <div>
+                            <input type="button" value="전액환불하기"
+                                onclick="refund_approve('<%= data[i].refund_id %>', '<%=data[i].order_id %>')"></button>
+                        </div>
+                        <% }
+                    } %>
+                </td>
+                <td>
+                    <% if(data[i].status == 900 || data[i].status == 910) { %>
+                        <input type="button" value="환불거절하기"
+                            onclick="refund_reject('<%= data[i].refund_id %>', '<%=data[i].order_id %>')"></button>
+                    <% } %>
+                </td>
+            </tr>
+            <% } %>
+
+        </tbody>
+    </table>
+    <script>
+        // 환불 승인 함수
+        function refund_approve(refund_id, order_id) {
+            if (confirm("환불을 승인하시겠습니까?")) {
+                var xhttp = new XMLHttpRequest()
+                var requestBody = {
+                    refund_id: refund_id,
+                    order_id: order_id
+                }
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 400) {
+                        alert('환불에 실패하였습니다!')
+                        window.location.reload();
+                    } else if(this.readyState == 4 && this.status == 200){
+                        alert('환불이 정상적으로 완료되었습니다!')
+                        window.location.reload();
+                    }
+                }
+                xhttp.open("POST", "/admin/refund/approve")
+                xhttp.setRequestHeader('Content-Type', 'application/json')
+                xhttp.send(JSON.stringify(requestBody))
+            } else {
+                console.log("취소되었습니다.");
+            }
+        }
+
+        // 환불 거절 함수
+        function refund_reject(refund_id, order_id) {
+            var text = prompt("환불거절사유를 입력하세요");
+            if (text === null) {
+                alert("환불거절이 취소되었습니다.")
+            } else {
+                var check = confirm("환불을 거절하시겠습니까?")
+                if (check === true) {
+                    var xhttp = new XMLHttpRequest()
+                    var requestBody = {
+                        refund_id: refund_id,
+                        order_id: order_id,
+                        content: text
+                    }
+                    xhttp.onreadystatechange = function () {
+                        if (this.readyState == 4 && this.status == 200) {
+                            alert('정상적으로 환불이 거절되었습니다!')
+                            window.location.reload();
+                        } 
+                    }
+                    xhttp.open("POST", "/admin/refund/reject")
+                    xhttp.setRequestHeader('Content-Type', 'application/json')
+                    xhttp.send(JSON.stringify(requestBody))
+
+                } else {
+                    alert("환불거절이 취소되었습니다.")
+                }
+            }
+        }
+        //영수증 생성
+        // function make_bill(formName){
+        //     frm = document.getElementById(formName);
+        //     window.open('/admin/bill', 'viewer', 'width=1000, height=700');
+        //     frm.action = '/admin/bill';
+        //     frm.target = "viewer";
+        //     frm.method = 'post'
+        //     frm.submit();
+        // }
+        //이 파일에서 bill.ejs로 넘어갈 수 있는 방법이 있으면 window.open('bill.ejs')로 해결 됨.
+        //아니면 서버로 데이터를 넘기고 새창에서 bill.ejs를 필 수 있으면 좋음
+        function make_bill(formName){
+            window.open('bill.ejs', 'viewer', 'width=1000, height=700');
+        }
+    </script>
+</body>
+
+</html>

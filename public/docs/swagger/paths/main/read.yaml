@@ -1,0 +1,32 @@
+put:
+  tags:
+    - 메인페이지
+  summary: 큐알림 읽기 여부 
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            review_idx:
+              type: string
+              description: 큐알림 고유id
+          require:
+            - notification_idx
+          example:
+            notification_idx: '5ef59fc0c1532e433898b9cc'
+  responses:
+    '200':
+      $ref: '../../components/responses.yaml#200-UPDATE_SUCCESS'
+    '400      ':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

@@ -1,0 +1,39 @@
+get:
+  tags:
+    - 마이페이지
+  summary: 유저 정보 조회
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+  responses:
+    '200':
+      description: 유저 데이터 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: 데이터 조회 성공
+              data:
+                type: object
+                example: {
+                  "user_idx": "2",
+                  "name": "이승규",
+                  "email": "qkrwotjd1445@naver.com",
+                  "profile_img": "http://k.kakaocdn.net/dn/jWek5/btqxtXEQC2w/6oHjGm5Qzf8emFGj4la5fK/img_640x640.jpg",
+                  "qmoney": 0
+                }
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

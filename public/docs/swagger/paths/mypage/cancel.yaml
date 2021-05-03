@@ -1,0 +1,130 @@
+get:
+  tags:
+    - 마이페이지
+  summary: 환불 내역 조회
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  responses:
+    '200':
+      description: 환불 데이터 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: 데이터 조회 성공
+              data:
+                type: array
+                example: [
+                  {
+                    "refund_id": "2ef1jkl3ija4jkl",
+                    "order_id": "mid_2ef1jkl3i",
+                    "order_date": "2020-02-02T13:00",
+                    "main_img": "https://sparkle.com",
+                    "name": "스파클 2L*6개입 외 2개",
+                    "price": 10000,
+                    "is_refund": 1
+                  },
+                  {
+                    "refund_id": "2ef1jkl3ija4jkl",
+                    "order_id": "mid_2ef1jkl3i",
+                    "order_date": "2020-02-02T13:00",
+                    "main_img": "https://sparkle.com",
+                    "name": "스파클 2L*6개입 외 2개",
+                    "price": 10000,
+                    "is_refund": 1
+                  },
+                    ...
+                  ]
+                
+    '500':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'
+
+post:
+  tags:
+    - 마이페이지
+  summary: 상품 환불하기
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            order_id:
+              type: string
+              description: 주문 고유id
+            product:
+              type: array
+              description: 상품 정보
+              items:
+                type: object
+                properties:
+                  product_id:
+                    type: string
+                    description: 환불 상품 고유id
+                  count:
+                    type: integer
+                    description: 환불 상품 수량
+                  price:
+                    type: integer
+                    description: 상품 가격(수량 * 상품 1개당 가격)
+            price:
+              type: integer
+              description: 환불 총 요청 금액
+            content:
+              type: string
+              description: 환불 사유
+            img:
+              type: string
+              description: 환불 인증 파일
+            is_all:
+              type: integer
+              description: '전체환불 여부(부분환불: 0, 전체환불: 1)'
+          require:
+            - order_id
+            - product_id
+            - count
+            - price
+            - content
+            - img
+            - is_all
+          example:
+            order_id: 'mid_32dkfjei'
+            product: [{product_id: '02398402934a20942', count: 2, price: 2000}, 
+              {product_id: '209234234aa209348', count: 3, price: 3000}]
+            price: 5000
+            content: '유통기한이 지났어요!'
+            imgs: 'chicken.jpg'
+            is_all: 0
+  responses:
+    '201':
+      $ref: '../../components/responses.yaml#201-SAVE_SUCCESS'
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '400 ':
+      $ref: '../../components/responses.yaml#400-WRONG_PARAMS'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

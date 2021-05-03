@@ -1,0 +1,377 @@
+200-DELETE_SUCCESS:
+  description: 데이터 삭제 성공
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 200
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: '데이터 삭제 성공'
+200-JOIN_SUCCESS:
+  description: 반상회 신청 성공
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 200
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: '반상회 신청 성공'
+200-APPROVAL_SUCCESS:
+  description: 주문에 대한 카드 결제가 정상적으로 완료되었습니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 200
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: '주문에 대한 카드 결제가 정상적으로 완료되었습니다.'
+200-REFUND_REQUEST_SUCCESS:
+  description: 환불요청이 정상적으로 신청되었습니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 200
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: '환불요청이 정상적으로 신청되었습니다.'
+201-SAVE_SUCCESS:
+  description: 데이터 저장 성공
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 201
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: '데이터 저장 성공'
+200-UPDATE_SUCCESS:
+  description: 데이터 수정 성공
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 200
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: '데이터 수정 성공'
+201-LIKE_SUCCESS:
+  description: 좋아요 설정 성공
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 201
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: '좋아요 설정 성공'
+201-LIKE_DELETE_SUCCESS:
+  description: 좋아요 해제 성공
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 201
+          success:
+            type: boolean
+            example: true
+          message:
+            type: string
+            example: '좋아요 해제 성공'
+400-WRONG_PARAMS:
+  description: Params나 Body에 잘못된 값이 입력되어서 조회(or 쓰기 or 수정 or 삭제)할 데이터가 없습니다. (또는 서버의 DB에 데이터를 넣지 않아서 발생하는 에러일 수도 있습니다.)
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Params나 Body에 잘못된 값이 입력되어서 조회(or 쓰기 or 수정 or 삭제)할 데이터가 없습니다. (또는 서버의 DB에 데이터를 넣지 않아서 발생하는 에러일 수도 있습니다.)
+400-NULL_VALUE:
+  description: Params나 Body 중 필수적으로 입력해야 하는 값인데, 입력하지 않은 값(NULL)이 존재합니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: Params나 Body 중 필수적으로 입력해야 하는 값인데, 입력하지 않은 값(NULL)이 존재합니다.
+400-NULL_PRODUCT:
+  description: 해당 상품이 존재하지 않습니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 해당 상품이 존재하지 않습니다.
+400-TOO_MANY_FILES:
+  description: 사진이 2장 이상 첨부된 경우
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 첨부 가능한 파일 개수를 확인해주세요.
+400-SEARCH_OR_CATEGORY:
+  description: query parameter에서 search나 category 중 하나의 파라미터만 입력해야 합니다. 둘 다 NULL이거나 둘 다 값을 입력할 수는 없습니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: query parameter에서 search나 category 중 하나의 파라미터만 입력해야 합니다. 둘 다 NULL이거나 둘 다 값을 입력할 수는 없습니다.
+400-MINIMUM:
+  description: 수량을 0개 이하로 감소시킬 수 없습니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 수량을 0개 이하로 감소시킬 수 없습니다.
+400-MAXIMUM:
+  description: 수량을 100개 이상으로 증가시킬 수 없습니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 수량을 100개 이상으로 증가시킬 수 없습니다.
+400-WRONG_DAY:
+  description: 날짜이기 때문에 1~31 범위의 값만 넣을 수 있습니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 날짜이기 때문에 1~31 범위의 값만 넣을 수 있습니다.
+400-ALREADY_CANCEL:
+  description: 이미 정기 배송이 취소 되어있습니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 이미 정기 배송이 취소 되어있습니다.
+400-APPROVAL_FAIL:
+  description: 주문에 대한 카드 결제가 실패하였습니다
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 주문에 대한 카드 결제가 실패하였습니다
+400-REFUND_REQUEST_FAIL:
+  description: 환불요청에 실패하였습니다
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 환불요청에 실패하였습니다
+
+
+##### 로그인관련
+400-NULL_USER:
+  description: 존재하지 않는 이메일입니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 존재하지 않는 이메일입니다.
+400-INVALID_PASSWORD:
+  description: 비밀번호가 일치하지 않습니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 비밀번호가 일치하지 않습니다.
+400-ALREADY_USER:
+  description: 중복된 이메일이 존재합니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 400
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 중복된 이메일이 존재합니다.
+
+
+
+
+
+######## 서버 에러
+500-INTERNAL_SERVER_ERROR:
+  description: 서버측에서 발생한 에러입니다.
+  content:
+    application/json:
+      schema:
+        type: object
+        properties:
+          status:
+            type: integer
+            example: 500
+          success:
+            type: boolean
+            example: false
+          message:
+            type: string
+            example: 서버측에서 발생한 에러입니다.

@@ -1,0 +1,19 @@
+put:
+  tags:
+    - 상품API version 2
+  summary: 상품 공유 횟수 증가 
+  parameters:
+    - in: path
+      name: product_idx
+      schema:
+        type: string
+      description: |
+        상품 고유번호
+      required: true
+  responses:
+    '200':
+      $ref: '../../components/responses.yaml#200-UPDATE_SUCCESS'
+    '400      ':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

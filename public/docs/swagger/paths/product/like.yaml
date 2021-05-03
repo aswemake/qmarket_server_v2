@@ -1,0 +1,74 @@
+post:
+  tags:
+    - 상품
+  summary: 상품 좋아요 설정
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            product_idx:
+              type: string
+              description: 상품 고유id
+          require:
+            - product_idx
+          example:
+            product_idx: '5f27a1ef371aad178caf5e29'
+  responses:
+    '201':
+      description: count는 상품 좋아요 개수, is_check는 유저 좋아요 클릭 여부
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 201
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '좋아요 설정 성공'
+              data:
+                type: object
+                example: {
+                  "count": 3,
+                  "is_check": true
+                }
+    '201 ':
+      description: count는 상품 좋아요 개수, is_check는 유저 좋아요 클릭 여부
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 201
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '좋아요 해제 성공'
+              data:
+                type: object
+                example: {
+                  "count": 3,
+                  "is_check": false
+                }
+    '400      ':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

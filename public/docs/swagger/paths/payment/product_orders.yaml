@@ -1,0 +1,111 @@
+post:
+  tags:
+    - 결제
+  summary: 상품 결제 하기
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            imp_uid:
+              type: string
+              description: 아임포트 결제 고유번호
+            receiver:
+              type: string
+              description: 수령인
+            phone:
+              type: string
+              description: 주문자 휴대폰 번호
+            email:
+              type: string
+              description: 주문자 이메일
+            mail_number:
+              type: integer
+              description: 주문자 우편번호
+            address:
+              type: string
+              description: 배송 주소
+            detail_address:
+              type: string
+              description: 배송 상세 주소
+            delivery_memo:
+              type: string
+              description: 배송 메시지
+            product:
+              type: array
+              description: 상품 정보
+              items:
+                type: object
+                properties:
+                  product_id:
+                    type: string
+                  count:
+                    type: integer
+            price:
+              type: integer
+              description: 상품 총 가격
+            pay_method:
+              type: string
+              description: 결제 수단(kakaopay, inicis) // 둘중 하나로 보내주세요
+            coupon_idx:
+              type: string
+              description: 사용하려고 하는 쿠폰 고유 번호 // 없으면 안 보내셔도 됩니다
+            coupon_price:
+              type: integer
+              description: 쿠폰 할인금액 // 쿠폰이 없을경우 0원이라도 보내셔야 합니다
+            qmoney:
+              type: integer
+              description: 큐머니 사용금액 // 사용안할 경우 0원이라도 보내셔야 합니다
+            delivery_price:
+              type: integer
+              description: 배달비 // 사용안할 경우 0원이라도 보내셔야 합니다
+          require:
+            - imp_uid
+            - merchant_uid
+            - receiver
+            - phone
+            - email
+            - mail_number
+            - address
+            - detail_address
+            - delivery_memo
+            - product
+            - price
+            - pay_method
+            - coupon_price
+            - qmoney
+            - delivery_price
+          example:
+            imp_uid: '4efj1ks2jk1jkl0'
+            receiver: '고성진'
+            phone: '01048302250'
+            email: 'w8348@naver.com'
+            mail_number: 32630
+            address: '인천광역시 남구 용현동 66-29'
+            detail_address: '패밀리고시원 202호'
+            delivery_memo: '현관문 앞'
+            product: [{product_id: '02398402934a20942', count: 2}, 
+              {product_id: '209234234aa209348', count: 3}]
+            price: 25000
+            pay_method: 'kakaopay'
+            coupon_idx: '5e44f935a881803990beb03c'
+            coupon_price: 1000
+            qmoney: 0
+            delivery_price: 0
+  responses:
+    '200':
+      $ref: '../../components/responses.yaml#200-APPROVAL_SUCCESS'
+    '400':
+      $ref: '../../components/responses.yaml#400-APPROVAL_FAIL'
+    '500':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

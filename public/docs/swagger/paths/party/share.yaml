@@ -1,0 +1,25 @@
+put:
+  tags:
+    - 반상회
+  summary: 반상회 공유 횟수 증가 
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            party_idx:
+              type: string
+              description: 반상회 고유id
+          require:
+            - party_idx
+          example:
+            party_idx: '5ee9b0eac304473024791b6e'
+  responses:
+    '200':
+      $ref: '../../components/responses.yaml#200-UPDATE_SUCCESS'
+    '400      ':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

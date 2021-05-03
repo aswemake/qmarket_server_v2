@@ -1,0 +1,45 @@
+post:
+  tags:
+    - 상품API version 2
+  summary: 상품 리뷰 작성
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+    - in: path
+      name: product_idx
+      schema:
+        type: string
+      description: |
+        상품 고유번호
+      required: true
+  requestBody:
+    require: true
+    content:
+      multipart/form-data:
+        schema:
+          type: object
+          properties:
+            content:
+              type: string
+              description: 리뷰 내용
+              required: true
+            score:
+              type: double
+              description: 리뷰 별점
+              required: true
+            imgs:
+              type: array
+              description: 리뷰 이미지
+  responses:
+    '201':
+      $ref: '../../components/responses.yaml#201-SAVE_SUCCESS'
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '400 ':
+      $ref: '../../components/responses.yaml#400-WRONG_PARAMS'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

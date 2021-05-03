@@ -1,0 +1,91 @@
+get:
+  tags:
+    - 반상회
+  summary: 반상회 상세 정보
+  parameters:
+    - in: query
+      name: party_idx
+      schema:
+        type: string
+      description: |
+        반상회 고유id
+
+  responses:
+    '200':
+      description: 반상회 데이터 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '반상회 데이터 조회 성공'
+              data:
+                type: object
+                example: {
+                  "party_img": [
+                    "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf",
+                    "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf",
+                    "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf"
+                  ],
+                  "party_name": "21세기 반상회",
+                  "location": "인하대 후문 안암 아줌마 치킨",
+                  "address": "인천 미추홀구 인하로67번길 6-19",
+                  "leader": "류지원님",
+                  "date": "매월 첫째 주 금요일",
+                  "start_time": [
+                    "2020-06-16T15:00",
+                    "2020-07-16T15:00",
+                    "2020-08-16T15:00",
+                    "2020-09-16T15:00",
+                  ],
+                  "content": "야식 메뉴로 빠지면 섭섭한 치킨...(반상회 소개)",
+                  "pattern": [1, 1, 1, 1],
+                  "member": {
+                    "max": 6,
+                    "user": [{
+                      "name": "고성진",
+                      "profile_img": "kakao.img"
+                  },
+                  {
+                      "name": "이승규",
+                      "profile_img": "kakao.img"
+                  },
+                  ...,
+                  ],
+                  },
+                  "is_finished": false,
+                  "episode": 2,
+                  "shared_count": 220,
+                  "like": 150,
+                  "feed": [{
+                    "feed_idx": "5e267869fe5f9a36acaef788",
+                    "feed_img": "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf",
+                    "feed_name": "12월 15일 첫 모임 진행"
+                  },
+                  {
+                    "feed_idx": "5e72d1760bb57a307c4a3c39",
+                    "feed_img": "https://alasdlfknasfnlkafnasmdf.alzsdkfnlasndf",
+                    "feed_name": "1월 15일 두번째 모임 진행"
+                  },
+                  ...,
+                  ],
+                  "review": [{
+                    "name": "이승규",
+                    "content": "최고의 반상회!",
+                    "created_at": "2020-06-17T15:00"
+                  },
+                  ...,
+                  ]
+                }
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

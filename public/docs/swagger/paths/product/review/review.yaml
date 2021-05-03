@@ -1,0 +1,97 @@
+get:
+  tags:
+    - 상품
+  summary: 상품 리뷰 보기
+  parameters:
+    - in: query
+      name: product_idx
+      schema:
+        type: string
+      description: |
+        상품 고유id
+    - in: query
+      name: sort
+      schema:
+        type: string
+      description: |
+        인기순 - best , 최신순 - 보낼 필요 없음
+
+  responses:
+    '200':
+      description: 리뷰 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '리뷰 조회 성공'
+              data:
+                type: object
+                example: [{
+                  "review_idx": "2019183132na019283",
+                  "name": "류지원님",
+                  "content": "물이 상큼하니 맛있어요!",
+                  "created_at": "2020-01-09T13:00:00",
+                  "like": 3,
+                  "score": 3.5,
+                },
+                ...,
+                ]
+    '400':
+      $ref: '../../../components/responses.yaml#400-NULL_VALUE'
+    '500  ':
+      $ref: '../../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'
+
+post:
+  tags:
+    - 상품
+  summary: 상품 리뷰 작성
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+    - in: query
+      name: product_idx
+      schema:
+        type: string
+      description: |
+        상품 고유id
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            content:
+              type: string
+              description: 리뷰 내용
+            score:
+              type: double
+              description: 리뷰 별점
+          require:
+            - content
+            - score
+          example:
+            content: '물맛이 너무 좋아요!'
+            score: 3.5
+  responses:
+    '201':
+      $ref: '../../../components/responses.yaml#201-SAVE_SUCCESS'
+    '400':
+      $ref: '../../../components/responses.yaml#400-NULL_VALUE'
+    '400 ':
+      $ref: '../../../components/responses.yaml#400-WRONG_PARAMS'
+    '500 ':
+      $ref: '../../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

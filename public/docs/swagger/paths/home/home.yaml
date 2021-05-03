@@ -1,0 +1,213 @@
+get:
+  tags:
+    - 홈화면
+  summary: 홈화면 구성
+  parameters:
+    - in: query
+      name: b_code
+      schema:
+        type: string
+      description: |
+        법정동코드 (b_code 또는 h_code 중 하나만 입력)
+      required: true
+    - in: query
+      name: h_code
+      schema:
+        type: string
+      description: |
+        행정동코드 (b_code 또는 h_code 중 하나만 입력)
+
+  responses:
+    '200':
+      description: 데이터 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 조회 성공'
+              data:
+                type: object
+                example: {
+                  "banner": [
+                      {
+                          "link": {
+                              "link_address": "",
+                              "link_type": ""
+                          },
+                          "_id": "5fd083b2f5bd68cfe1127ba7",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/배너_5.jpg"
+                      }
+                  ],
+                  "recommend": [
+                      {
+                          "product_idx": "6020d07af5bd68cfe181022d",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                          "detail_name": "카테고리(고추/쌈채소) 상품 1",
+                          "sale_ratio": 0.2,
+                          "saled_price": 2080,
+                          "price": 2600,
+                          "is_adult": false,
+                          "like": 0
+                      },
+                      {
+                          "product_idx": "6020f947f5bd68cfe1818b22",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                          "detail_name": "카테고리(두유) 상품 1",
+                          "sale_ratio": 0,
+                          "saled_price": 2600,
+                          "price": 2600,
+                          "is_adult": false,
+                          "like": 0
+                      },
+                      {
+                          "product_idx": "6020dc23f5bd68cfe1811e06",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                          "detail_name": "카테고리(현미/잡곡) 상품 2",
+                          "sale_ratio": 0,
+                          "saled_price": 2600,
+                          "price": 2600,
+                          "is_adult": false,
+                          "like": 0
+                      },
+                      {
+                          "product_idx": "6021e831f5bd68cfe1821445",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                          "detail_name": "카테고리(생활가전) 상품 2",
+                          "sale_ratio": 0,
+                          "saled_price": 2600,
+                          "price": 2600,
+                          "is_adult": false,
+                          "like": 0
+                      },
+                      {
+                          "product_idx": "6020ef6df5bd68cfe1817928",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                          "detail_name": "카테고리(스낵/쿠키) 상품 1",
+                          "sale_ratio": 0,
+                          "saled_price": 2600,
+                          "price": 2600,
+                          "is_adult": false,
+                          "like": 0
+                      }
+                  ],
+                  "best": [
+                    {
+                        "product_idx": "6020d07af5bd68cfe181022d",
+                        "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                        "detail_name": "카테고리(고추/쌈채소) 상품 1",
+                        "sale_ratio": 0.2,
+                        "saled_price": 2080,
+                        "price": 2600,
+                        "is_adult": false,
+                        "like": 0
+                    },
+                    {
+                        "product_idx": "6020d13af5bd68cfe18102fd",
+                        "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                        "detail_name": "카테고리(버섯) 상품 1",
+                        "sale_ratio": 0,
+                        "saled_price": 2600,
+                        "price": 2600,
+                        "is_adult": false,
+                        "like": 0
+                    },
+                    {
+                        "product_idx": "6020d0cdf5bd68cfe1810287",
+                        "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                        "detail_name": "카테고리(고추/쌈채소) 상품 2",
+                        "sale_ratio": 0,
+                        "saled_price": 2600,
+                        "price": 2600,
+                        "is_adult": false,
+                        "like": 0
+                    },
+                    {
+                        "product_idx": "6020c53cf5bd68cfe180eaa2",
+                        "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                        "detail_name": "카테고리(계란/메추리알) 상품 1",
+                        "sale_ratio": 0,
+                        "saled_price": 2600,
+                        "price": 2600,
+                        "is_adult": false,
+                        "like": 0
+                    },
+                    {
+                        "product_idx": "6020c703f5bd68cfe180edda",
+                        "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                        "detail_name": "카테고리(계란/메추리알) 상품 2",
+                        "sale_ratio": 0,
+                        "saled_price": 2600,
+                        "price": 2600,
+                        "is_adult": false,
+                        "like": 0
+                    }
+                  ],
+                  "latest": [
+                      {
+                          "product_idx": "6020d07af5bd68cfe181022d",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                          "detail_name": "카테고리(고추/쌈채소) 상품 1",
+                          "sale_ratio": 0.2,
+                          "saled_price": 2080,
+                          "price": 2600,
+                          "is_adult": false,
+                          "like": 0
+                      },
+                      {
+                          "product_idx": "6020d0cdf5bd68cfe1810287",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                          "detail_name": "카테고리(고추/쌈채소) 상품 2",
+                          "sale_ratio": 0,
+                          "saled_price": 2600,
+                          "price": 2600,
+                          "is_adult": false,
+                          "like": 0
+                      },
+                      {
+                          "product_idx": "6020c53cf5bd68cfe180eaa2",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                          "detail_name": "카테고리(계란/메추리알) 상품 1",
+                          "sale_ratio": 0,
+                          "saled_price": 2600,
+                          "price": 2600,
+                          "is_adult": false,
+                          "like": 0
+                      },
+                      {
+                          "product_idx": "6020c703f5bd68cfe180edda",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                          "detail_name": "카테고리(계란/메추리알) 상품 2",
+                          "sale_ratio": 0,
+                          "saled_price": 2600,
+                          "price": 2600,
+                          "is_adult": false,
+                          "like": 0
+                      },
+                      {
+                          "product_idx": "6020c7a7f5bd68cfe180ef83",
+                          "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                          "detail_name": "카테고리(소고기) 상품 1",
+                          "sale_ratio": 0,
+                          "saled_price": 2600,
+                          "price": 2600,
+                          "is_adult": false,
+                          "like": 0
+                      }
+                    ]
+                }
+                
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '400 ':
+      $ref: '../../components/responses.yaml#400-WRONG_PARAMS'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

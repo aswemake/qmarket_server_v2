@@ -1,0 +1,212 @@
+# Open API 버전 (주로 3.0.0을 이용한다.)
+openapi: 3.0.0
+
+# API 문서에 대한 정보 (버전, 제목, 설명)
+info:
+  version: '1.0.0'
+  title: '큐마켓'
+  description: '2030 1인 가구를 위한 맞춤형 이커머스'
+  
+# API 서버에 대한 정보
+servers:
+  - url: "https://www.qmarket.me"
+  #- url: "http://54.180.46.143:3000/"
+  #- url: "http://localhost:3000/"
+    description: 큐마켓 API # 제공하는 API에 대한 설명
+
+tags:
+  - name: 홈화면
+    description: 홈화면 구성
+  - name: 협력업체
+    description: 파트너마트, 큐메이커
+  - name: 상품API version 2
+    description: 자체상품 및 생필품
+  - name: 상품
+    description: 자체상품 및 생필품
+  - name: SNS 로그인 및 토큰관리
+    description: SNS로그인(카카오,네이버,애플) 및 토큰관리(로그인토큰, 성인인증토큰, 큐알림토큰)
+  - name: 큐알림
+    description: 큐알림 관련
+  - name: 메인페이지
+    description: 생필품 및 반상회 관련
+  - name: 반상회
+    description: 반상회 관련
+  - name: 유저 관련 정보 API version 2 (마이페이지)
+    description: 유저 관련 정보
+  - name: 마이페이지
+    description: 마이페이지 관련
+  - name: 결제
+    description: 결제 관련
+
+# 각 URI에 대한 정보를 기재
+paths:
+
+  /auth/login/kakao:
+    $ref: './paths/auth/login_kakao.yaml'
+  /auth/login/naver:
+    $ref: './paths/auth/login_naver.yaml'
+  /auth/login/apple:
+    $ref: './paths/auth/login_apple.yaml'
+  /auth/verify:
+    $ref: './paths/auth/verify.yaml'
+  /auth/fcm:
+    $ref: './paths/auth/fcm.yaml'
+  /auth/adult:
+    $ref: './paths/auth/adult.yaml'
+
+  # /q-notifications:
+  #   $ref: './paths/q_notifications/q_notification_list.yaml'
+  # /q-notifications/{notification_idx}:
+  #   $ref: './paths/q_notifications/q_notification_read_delete.yaml'
+  # /q-notifications/all:
+  #   $ref: './paths/q_notifications/q_notification_all_delete.yaml'
+
+  /main/home:
+    $ref: './paths/main/home.yaml'
+  /main/hashtag:
+    $ref: './paths/main/hashtag.yaml'
+  /main/search:
+    $ref: './paths/main/search.yaml'
+  /main/notification:
+    $ref: './paths/main/notification.yaml'
+  /main/notification/read:
+    $ref: './paths/main/read.yaml'
+  /main/notification/delete:
+    $ref: './paths/main/delete.yaml'
+  /main/notification/delete/all:
+    $ref: './paths/main/delete_all.yaml'
+
+  /home:
+    $ref: './paths/home/home.yaml'
+
+  /partner:
+    $ref: './paths/partner/partner.yaml'
+  /partner/recommendation:
+    $ref: './paths/partner/partner_recommendation.yaml'
+
+  /products:
+    $ref: './paths/products/product_list.yaml'
+  /products/{product_idx}:
+    $ref: './paths/products/product_detail.yaml'
+  /products/{product_idx}/like:
+    $ref: './paths/products/product_like.yaml'
+  /products/{product_idx}/share:
+    $ref: './paths/products/product_share.yaml'
+  /products/{product_idx}/reviews:
+    $ref: './paths/products/review_list.yaml'
+  /products/{product_idx}/review:
+    $ref: './paths/products/review_write.yaml'
+  /products/{product_idx}/reviews/{review_idx}/like:
+    $ref: './paths/products/review_like.yaml'
+  /products/{product_idx}/qnas:
+    $ref: './paths/products/qna_list.yaml'
+  /products/{product_idx}/qna:
+    $ref: './paths/products/qna_write.yaml'
+
+  /product/main:
+    $ref: './paths/product/main.yaml'
+  /product/category:
+    $ref: './paths/product/category.yaml'
+  /product/like:
+    $ref: './paths/product/like.yaml'
+  /product/info:
+    $ref: './paths/product/info.yaml'
+  /product/share:
+    $ref: './paths/product/share.yaml'
+  /product/review:
+    $ref: './paths/product/review/review.yaml'
+  /product/review/like:
+    $ref: './paths/product/review/like.yaml'
+  /product/review/own:
+    $ref: './paths/product/review/own.yaml'
+  /product/QnA:
+    $ref: './paths/product/QnA.yaml'
+  /product/QnA/own:
+    $ref: './paths/product/QnA_own.yaml'
+  /product/event:
+    $ref: './paths/product/event.yaml'
+
+  /party/main:
+    $ref: './paths/party/main.yaml'
+  /party/info:
+    $ref: './paths/party/info.yaml'
+  /party/feed:
+    $ref: './paths/party/feed.yaml'
+  /party/feed_all:
+    $ref: './paths/party/feed_all.yaml'
+  /party/mission:
+    $ref: './paths/party/mission.yaml'
+  /party/all:
+    $ref: './paths/party/all.yaml'
+  /party/like:
+    $ref: './paths/party/like.yaml'
+  /party/share:
+    $ref: './paths/party/share.yaml'
+  /party/review:
+    $ref: './paths/party/review.yaml'
+
+  /user:
+    $ref: './paths/user/user.yaml'
+  /user/orders:
+    $ref: './paths/user/order_list.yaml'
+  /user/orders/{order_id}:
+    $ref: './paths/user/order_detail.yaml'
+  /user/orders/{order_id}/purchase-confirmation:
+    $ref: './paths/user/order_purchase_confirmation.yaml'
+  /user/refunds:
+    $ref: './paths/user/refund_list.yaml'
+  /user/refunds/{refund_id}:
+    $ref: './paths/user/refund_detail.yaml'
+  /user/refund:
+    $ref: './paths/user/refund.yaml'
+  /user/issueable-coupons:
+    $ref: './paths/user/issueable_coupons.yaml'
+  /user/available-coupons:
+    $ref: './paths/user/available-coupons.yaml'
+  /user/coupon:
+    $ref: './paths/user/coupon.yaml'
+  /user/qmoney:
+    $ref: './paths/user/qmoney.yaml'
+  /user/qnas:
+    $ref: './paths/user/qna_list.yaml'
+  /user/reviews:
+    $ref: './paths/user/review_list.yaml'
+  /user/review:
+    $ref: './paths/user/review_delete.yaml'
+
+  /mypage/users:
+    $ref: './paths/mypage/user.yaml'
+  /mypage/order:
+    $ref: './paths/mypage/order.yaml'
+  /mypage/order/info:
+    $ref: './paths/mypage/order_info.yaml'
+  /mypage/order/cancel:
+    $ref: './paths/mypage/cancel.yaml'
+  /mypage/order/cancel/info:
+    $ref: './paths/mypage/cancel_info.yaml'
+  /mypage/coupon:
+    $ref: './paths/mypage/coupon.yaml'
+  /mypage/qmoney:
+    $ref: './paths/mypage/qmoney.yaml'
+  /mypage/QnA:
+    $ref: './paths/mypage/QnA.yaml'
+  /mypage/review:
+    $ref: './paths/mypage/review.yaml'
+  /mypage/review/delete:
+    $ref: './paths/mypage/delete.yaml'
+
+  /mypage/party:
+    $ref: './paths/mypage/party.yaml'
+  /mypage/benefit:
+    $ref: './paths/mypage/benefit.yaml'
+
+  # /payment/success:
+  #   $ref: './paths/payment/payment_success.yaml'
+  /payment/product_orders:
+    $ref: './paths/payment/product_orders.yaml'
+  /payment/party_orders:
+    $ref: './paths/payment/party_orders.yaml'
+  /payment/party:
+    $ref: './paths/payment/party.yaml'
+  /payment/users:
+    $ref: './paths/payment/users.yaml'

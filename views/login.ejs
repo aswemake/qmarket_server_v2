@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <title>큐마켓 - 로그인</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://www.gstatic.com/firebasejs/7.16.1/firebase.js"></script>
+    <!-- <script>
+        //뒤로가기를 막긴 했는데 아무곳이나 클릭을 해야만 작동함.
+        history.pushState(null, null, '/start');
+        window.addEventListener('popstate', function(event) {  
+            history.pushState(null, null, '/start');
+        }); 
+    </script> -->
+    <style>
+        :root {
+            --gray: #F8F8F8;
+            --red: #E7713F;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: sans-serif;
+        }
+
+        body {
+            padding-top: 100px;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+
+        h1,
+        footer {
+            text-align: center;
+        }
+
+        footer {
+            margin-top: 40px;
+            font-size: 0.5em;
+        }
+
+        body>div {
+            width: 300px;
+            display: flex;
+            flex-direction: column;
+            margin: auto;
+        }
+
+        input {
+            border: none;
+            border-bottom: 1px solid #F0F0F0;
+            width: 100%;
+            padding: 12px 20px;
+            margin-bottom: 12px;
+            outline: none;
+        }
+
+        button {
+            background-color: var(--red);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 12px 20px;
+            outline: none;
+            cursor: pointer;
+        }
+
+        button:disabled {
+            background-color: var(--gray);
+            cursor: default;
+        }
+
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <h1>큐마켓 - 관리자</h1>
+    <div id="outo_click">
+        <select style="height:40px" onchange="changeType()" id="login_type">
+            <option value="admin">
+                관리자 로그인
+            </option>
+            <option value="manager">
+                사장님 로그인
+            </option>
+            <option value="rider">
+                기사님 로그인
+            </option>
+        </select>
+        <input id="id" type="text" placeholder="아이디" autocomplete="off">
+        <input id="pw" type="password" placeholder="비밀번호">
+        <label id="invalid" class="hidden">아이디 혹은 비밀번호가 일치하지 않습니다</label>
+        <button id="button" onclick="login()" disabled>로그인</button>
+    </div>
+    <footer>
+        <p>큐마켓의 서비스를 유지/관리하기 위한 사이트입니다.</p>
+    </footer>
+    <script src="/javascripts/myScript.js"></script>
+    <script>
+        async function get_fcm_token() {
+            var config = {
+                apiKey: "<%= process.env.FCM_apiKey %>",
+                authDomain: "<%= process.env.FCM_authDomain %>",
+                databaseURL: "<%= process.env.FCM_databaseURL %>",
+                projectId: "<%= process.env.FCM_projectId %>",
+                storageBucket: "<%= process.env.FCM_storageBucket %>",
+                messagingSenderId: "<%= process.env.FCM_messagingSenderId %>",
+                appId: "<%= process.env.FCM_appId %>",
+                measurementId: "<%= process.env.FCM_measurementId %>"
+            };
+            try {
+                firebase.initializeApp(config);
+            } catch (error) {
+                console.log(error)
+            }
+            let fcm_token = "";
+            const messaging = firebase.messaging();
+            await messaging.requestPermission()
+                .then(function () {
+                    return messaging.getToken();
+                })
+                .then(function (token) {
+                    fcm_token = token;
+                })
+                .catch(function (err) {
+                    console.log("Error Occured");
+                });
+
+            return fcm_token;
+        }
+
+        async function login() {
+            fcm_token = await get_fcm_token();
+            var login_type = document.getElementById('login_type').value
+            if (login_type == "admin") {
+                var id = document.getElementById("id")
+                var pw = document.getElementById("pw")
+                var data = {
+                    id: id.value,
+                    password: pw.value,
+                    type: login_type
+                }
+            } else if (login_type == "manager") {
+                var id = document.getElementById("id")
+                var pw = document.getElementById("pw")
+                var data = {
+                    id: id.value,
+                    password: pw.value,
+                    type: login_type,
+                    fcm_token: fcm_token
+                }
+            } else if (login_type == "rider"){
+                var id = document.getElementById("id")
+                var pw = document.getElementById("pw")
+                var data = {
+                    id: id.value,
+                    password: pw.value,
+                    type: login_type
+                }
+            }
+            var xhttp = new XMLHttpRequest()
+            xhttp.onreadystatechange = function () {
+                if (this.readyState == 4 && this.status == 200) {
+                    window.location.href = xhttp.responseURL;
+                } else if (this.readyState == 4 && this.status == 401) {
+                    alert("로그인 정보가 정확하지 않습니다.");
+                }
+            }
+            xhttp.open("POST", "/login");
+            xhttp.setRequestHeader('Content-Type', 'application/json');
+            xhttp.send(JSON.stringify(data));
+        }
+    </script>
+    <script>
+        var id = document.getElementById('id');
+        var pw = document.getElementById('pw');
+        var button = document.getElementById('button')
+
+        id.onkeyup = activeButton;
+        pw.onkeyup = activeButton;
+        function changeType() {
+            document.getElementById('id').value = "";
+            document.getElementById('pw').value = "";
+            button.disabled = true;
+        }
+        function activeButton(e) {
+            if (id.value.length >= 4 && pw.value.length >= 4) {
+                button.disabled = false;
+            } else {
+                button.disabled = true;
+            }
+        }
+        id.addEventListener("keyup", function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                button.click();
+            }
+        })
+        pw.addEventListener("keyup", function (event) {
+            if (event.keyCode === 13) {
+                event.preventDefault();
+                button.click();
+            }
+        })
+    </script>
+</body>
+
+</html>

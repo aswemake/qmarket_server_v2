@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="ko">
+
+<head>
+    <script src="https://sdk.amazonaws.com/js/aws-sdk-2.485.0.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.15.5/xlsx.full.min.js"></script>
+    <title>큐마켓 관리자</title>
+    <style>
+        .input-file-button {
+            padding: 6px 25px;
+            background-color: #E0713F;
+            border-radius: 4px;
+            color: white;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div>
+        <a style="width: 15%; font-size: medium;  margin-right: 10px;">엑셀 파일 첨부</a>
+        <label class="input-file-button" for="product_excel">파일 첨부</label>
+        <input onchange="onfilechange(this, 'product_excel_name')" style="flex:1; display:none;" type="file"
+            name="excel" id="product_excel" accept=".xlsx">
+        <input type="text" disabled="disabled" style="width:50%; font-size: medium; margin:20px; padding:10px;"
+            id="product_excel_name" value=""></input>
+    </div>
+    <input name="excel"
+        style="background-color:#E0713F; border:none; color:white; font-size: large; padding: 10px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2) ;"
+        type="button" onclick="sendExcelFile()" value="상품 등록하기" />
+    <script src="/javascripts/myScript.js"></script>
+    <!-- <script>
+        function onfilechange(file, id) {
+            console.log(file.files[0].name.split('.').pop());
+            var file_val = file.files[0].name;
+            if (id == 'image_detail_name') {
+                file_val = file.files[0].name + " 외" + (file.files.length - 1) + "개";
+            }
+            document.getElementById(id).value = file_val;
+        }
+        function renameKey(obj, oldKey, newKey) {
+            obj[newKey] = obj[oldKey];
+            delete obj[oldKey];
+        }
+        async function sendExcelFile() {
+            try {
+                let input = document.getElementById('product_excel');
+                let reader = new FileReader();
+                reader.onload = function () {
+                    let data = reader.result;
+                    let workBook = XLSX.read(data, { type: 'binary' });
+                    workBook.SheetNames.forEach(function (sheetName) {
+                        console.log('SheetName: ' + sheetName);
+                        let rows = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName]);
+                        rows.forEach(object => {
+                            renameKey(object, '바코드', 'barcode');
+                            renameKey(object, '상품이름', 'detail_name');
+                            renameKey(object, '상품 브랜드 이름', 'name');
+                            renameKey(object, '상품 카테고리', 'category');
+                            renameKey(object, '상품 원가', 'price');
+                            renameKey(object, '상품 할인율', 'sale_ratio');
+                            renameKey(object, '상품 재고', 'count');
+                            renameKey(object, '해시태그1', 'hashtag1');
+                            renameKey(object, '해시태그2', 'hashtag2');
+                            renameKey(object, '해시태그3', 'hashtag3');
+                            renameKey(object, '메인 이미지', 'main_img');
+                            renameKey(object, '상세 이미지', 'detail_img');
+
+                        })
+                        if (confirm("상품을 등록하시겠습니까?")) {
+                            var xhttp = new XMLHttpRequest()
+                            xhttp.onreadystatechange = function () {
+                                if (this.readyState == 4 && this.status == 200) {
+                                    alert('상품이 성공적으로 등록되었습니다.')
+                                }
+                            }
+                            xhttp.open("POST", "/manager/product/inventory/enroll_excel", true)
+                            xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+                            xhttp.send("file=" + JSON.stringify(rows));
+                            //window.location.reload()
+                        }
+                    })
+                };
+                reader.readAsBinaryString(input.files[0]);
+            } catch (error) {
+                alert(error);
+            }
+        }
+    </script> -->
+</body>
+
+</html>

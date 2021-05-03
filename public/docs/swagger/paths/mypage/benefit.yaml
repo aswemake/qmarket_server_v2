@@ -1,0 +1,47 @@
+get:
+  tags:
+    - 마이페이지
+  summary: 참여하고 있는 반상회 혜택 쿠폰
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  responses:
+    '200':
+      description: 반상회 데이터 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '반상회 데이터 조회 성공'
+              data:
+                type: array
+                example: 
+                  [{
+                    "party_idx": "5e16c61a5c7854281cb0c073",
+                    "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/입장권-01_ONE.png",
+                    "limit_date": "2020-04-26T00:00:00.000+00:00"
+                  },
+                  {
+                    "party_idx": "5e16c61a5c7854281cb0c073",
+                    "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/입장권-01_ALL.png",
+                    "limit_date": "2020-04-26T00:00:00.000+00:00"
+                  }]
+                
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

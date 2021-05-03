@@ -1,0 +1,77 @@
+get:
+  tags:
+    - SNS 로그인 및 토큰관리
+  summary: 성인인증 검사 
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  responses:
+    '200':
+      description: 성인인증 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 조회 성공'
+              data: 
+                type: object
+                example: {
+                  "is_adult": true
+                }
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'
+
+post:
+  tags:
+    - SNS 로그인 및 토큰관리
+  summary: 첫 성인인증 등록
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            imp_uid:
+              type: string
+              description: 사용자 고유 인증번호
+            success:
+              type: boolean
+              description: 성인인증 통과 여부
+          require:
+            - imp_uid
+            - success
+          example:
+            imp_uid: 'ds8UymNMkqs:APA91bGNK_ctDZy9353Trm5kYFkwZlx5HkiSSQjDPtREsLAXp-Y2jYTZoCnCLp02-J9qkI9nNzNUASAm0MSR46BkfG78RKbWcaF4Uo9SjSBs9_CqpXVIuaQG3BDmoTP7CA8VVbl0lC6'
+            success: true
+  responses:
+    '201':
+      $ref: '../../components/responses.yaml#201-SAVE_SUCCESS'
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '400 ':
+      $ref: '../../components/responses.yaml#400-WRONG_PARAMS'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

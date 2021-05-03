@@ -1,0 +1,63 @@
+get:
+  tags:
+    - 유저 관련 정보 API version 2 (마이페이지)
+  summary: 유저가 작성한 qna 리스트 조회
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  responses:
+    '200':
+      description: 유저가 작성한 qna 리스트 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 조회 성공'
+              data:
+                type: array
+                example: 
+                  [
+                    {
+                      "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                      "detail_name": "카테고리(계란/메추리알) 상품 1",
+                      "created_at": "2021-02-17T16:49:23.252Z",
+                      "content": "12345",
+                      "is_answerd": true,
+                      "answer": 
+                        [
+                          {
+                            "name": "플러스마트 강화점",
+                            "profile_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+육개장(컵).jpg",
+                            "created_at": "2021-02-17T16:51:08.887Z",
+                            "content": "sdfsdfsdfdsfsd"
+                          }
+                        ]
+                    },
+                    {
+                      "main_img": "https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/(썸네일)+차돌김치볶음밥+300g.jpg",
+                      "detail_name": "카테고리(계란/메추리알) 상품 1",
+                      "created_at": "2021-02-18T12:09:05.518Z",
+                      "content": "12345",
+                      "is_answerd": false,
+                      "answer": []
+                    }
+                  ]
+                  
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

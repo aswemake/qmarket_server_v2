@@ -1,0 +1,77 @@
+post:
+  tags:
+    - 결제
+  summary: 반상회 결제 하기
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            imp_uid:
+              type: string
+              description: 아임포트 결제 고유번호
+            party_idx:
+              type: string
+              description: 반상회 고유번호
+            coupon_idx:
+              type: string
+              description: 쿠폰 고유번호
+            coupon_price:
+              type: integer
+              description: 쿠폰 할인가격
+            qmoney:
+              type: integer
+              description: 큐머니 사용금액
+            count:
+              type: integer
+              description: 반상회 참석횟수
+            price:
+              type: integer
+              description: 총 결제 금액
+            name:
+              type: string
+              description: 신청인
+            phone:
+              type: string
+              description: 신청인 휴대폰 번호
+            pay_method:
+              type: string
+              description: 결제수단(kakao 또는 inicis)
+          require:
+            - imp_uid
+            - party_idx
+            - coupon_price
+            - qmoney
+            - count
+            - price
+            - name
+            - phone
+            - pay_method
+          example:
+            imp_uid: '4efj1ks2jk1jkl0'
+            party_idx: '5e16c61a5c7854281cb0c073'
+            coupon_idx: '5e44f935a881803990beb03c'
+            coupon_price: 0
+            qmoney: 0
+            count: 1
+            price: 25000
+            name: '고성진'
+            phone: '01048302250'
+            pay_method: 'kakaopay'
+  responses:
+    '200':
+      $ref: '../../components/responses.yaml#200-APPROVAL_SUCCESS'
+    '400':
+      $ref: '../../components/responses.yaml#400-APPROVAL_FAIL'
+    '500':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

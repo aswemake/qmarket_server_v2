@@ -1,0 +1,97 @@
+get:
+  tags:
+    - 반상회
+  summary: 이달의 미션 내용 받아오기
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+    - in: query
+      name: party_idx
+      schema:
+        type: string
+      description: |
+        반상회 고유id
+
+  responses:
+    '200':
+      description: 이달의 미션 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '이달의 미션 조회 성공'
+              data:
+                type: object
+                example: {
+                  "mission_idx": "df2f3klf3e1j4",
+                  "name": "abc123",
+                  "content": "치킨을 왜 180도에 튀겨야 하는지...",
+                  "is_submit": true,
+                  "mission":{
+                    "files": "미션.png",
+                    "content": "미션의 내용은 이러이러합니다."
+                  }
+                }
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'
+
+post:
+  tags:
+    - 반상회
+  summary: 이달의 미션 작성
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+    - in: query
+      name: mission_idx
+      schema:
+        type: string
+      description: |
+        미션 고유id
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            content:
+              type: string
+              description: 이달의 미션 의견
+            imgs:
+              type: string
+              description: 이미지 첨부 파일
+          require:
+            - content
+            - imgs
+          example:
+            content: '180도에 튀기면 더 맛있어요!'
+            imgs: 'chicken.jpg'
+  responses:
+    '201':
+      $ref: '../../components/responses.yaml#201-SAVE_SUCCESS'
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '400 ':
+      $ref: '../../components/responses.yaml#400-WRONG_PARAMS'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

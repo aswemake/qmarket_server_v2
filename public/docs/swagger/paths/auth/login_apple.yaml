@@ -1,0 +1,53 @@
+post:
+  tags:
+    - SNS 로그인 및 토큰관리
+  summary: 애플 로그인 
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+            name:
+              type: string
+              description: 사용자 이름
+            email:
+              type: string
+              description: 애플 이메일
+            apple_idx:
+              type: string
+              description: 사용자 애플 고유번호
+          require:
+            - name
+            - email
+            - apple_idx
+          example:
+            name: "홍길동"
+            email: "h4q4@privaterelay.appleid.com"
+            apple_idx: "023458.73ae03dkfuie3227c47072c6ae.0754"
+
+  responses:
+    '200':
+      description: 로그인 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '로그인 성공'
+              data: 
+                type: object
+                example: {
+                  "token":  "asdgasdgoiMTIzIasdgasdg-pFOwKZtyKPDhVOMQ2C8w"
+                }
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

@@ -1,0 +1,26 @@
+get:
+  tags:
+    - 유저 관련 정보 API version 2 (마이페이지)
+  summary: 주문 구매 확정
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+    - in: path
+      name: order_id
+      schema:
+        type: string
+      description: |
+        주문 고유번호
+      required: true
+
+  responses:
+    '200':
+      $ref: '../../components/responses.yaml#200-UPDATE_SUCCESS'
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

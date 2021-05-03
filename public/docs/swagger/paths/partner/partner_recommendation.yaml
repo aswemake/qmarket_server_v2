@@ -1,0 +1,35 @@
+post:
+  tags:
+    - 협력업체
+  summary: 마트 추천하기
+  requestBody:
+    require: true
+    content:
+      application/json:
+        schema:
+          type: object
+          properties:
+           phone:
+            type: string
+            description: 핸드폰 번호
+            required: true
+           mart_name:
+            type: string
+            description: 추천 마트 이름
+            required: true
+           address:
+            type: string
+            description: 추천인 현위치
+            required: true
+          example:
+            phone: "01020554097"
+            mart_name: "하나로마트"
+            address: "인천광역시 미추홀구 91번길 103"
+      
+  responses:
+    '201':
+      $ref: '../../components/responses.yaml#201-SAVE_SUCCESS'
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

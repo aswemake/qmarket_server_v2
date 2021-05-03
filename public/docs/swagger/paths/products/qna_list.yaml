@@ -1,0 +1,54 @@
+get:
+  tags:
+    - 상품API version 2
+  summary: 상품 QnA 리스트 조회
+  parameters:
+    - in: path
+      name: product_idx
+      schema:
+        type: string
+      description: |
+        상품 고유번호
+      required: true
+
+  responses:
+    '200':
+      description: QnA 조회 성공
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              status:
+                type: integer
+                example: 200
+              success:
+                type: boolean
+                example: true
+              message:
+                type: string
+                example: '데이터 조회 성공'
+              data:
+                type: array
+                example: [
+                  {
+                    "qna_idx": "602cca832879366290ef1093",
+                    "writer": "박성수",
+                    "question": "12345",
+                    "answer": "sdfsdfsdfdsfsd",
+                    "state": "답변완료",
+                    "created_at": "2021-02-17T16:49:23.252Z"
+                  },
+                  {
+                    "qna_idx": "602cca822879366290ef1092",
+                    "writer": "박성수",
+                    "question": "12345",
+                    "answer": "none",
+                    "state": "답변대기",
+                    "created_at": "2021-02-17T16:49:22.722Z"
+                  }
+                ]
+    '400':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500  ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'

@@ -1,0 +1,19 @@
+delete:
+  tags:
+    - 메인페이지
+  summary: 큐알림 전체 삭제
+  parameters:
+    - in: header
+      name: token
+      required: true
+      schema: 
+        type: string
+      description: 로그인 토큰
+
+  responses:
+    '200':
+      $ref: '../../components/responses.yaml#200-DELETE_SUCCESS'
+    '400      ':
+      $ref: '../../components/responses.yaml#400-NULL_VALUE'
+    '500 ':
+      $ref: '../../components/responses.yaml#500-INTERNAL_SERVER_ERROR'
