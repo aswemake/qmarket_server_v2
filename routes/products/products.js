@@ -173,7 +173,8 @@ router.get('/', async (req, res) => {
                             sale_ratio: Math.floor(sorted_products[i].sale_ratio * 100),
                             saled_price: sorted_products[i].saled_price,
                             is_adult: sorted_products[i].is_adult,
-                            one_hundred_deal_event: sorted_products[i].one_hundred_deal_event
+                            one_hundred_deal_event: sorted_products[i].one_hundred_deal_event,
+                            is_event: (sorted_products[i].sale_ratio == 0) ? false : true
                         }
                         final_products.push(final_product);
                     }
@@ -200,7 +201,7 @@ router.get('/:product_idx', async (req, res) => {
             let data = new Object();
             let product = await Product.find({ _id: product_idx, enabled: true });
             if (product.length <= 0) {
-                res.status(200).json(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_PRODUCT));
+                return res.status(200).json(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_PRODUCT));
             } else {
                 // 가격 계산
                 let price = product[0].original_price, sale_ratio = 0, saled_price = 0;
@@ -209,6 +210,7 @@ router.get('/:product_idx', async (req, res) => {
                 else { 
                     // sale_ratio 계산
                     let current_date = new Date(Date.now() + (3600000 * 9));
+                    
                     for (let i = 0; i < product[0].events.length; i++) {
                         if (product[0].events[i].start_date.getTime() <= current_date.getTime() && current_date.getTime() <= product[0].events[i].end_date.getTime()) {
                             sale_ratio += product[0].events[i].sale_ratio;
@@ -217,7 +219,7 @@ router.get('/:product_idx', async (req, res) => {
                             sale_ratio = 0.99; break;
                         }
                     }
-
+                    
                     // 기본 할인 적용 (상생 지원금 3.3%만큼 할인)
                     if (sale_ratio == 0) {
                         const default_sale_ratio = 0.033;
@@ -231,7 +233,7 @@ router.get('/:product_idx', async (req, res) => {
                         saled_price = saled_price - (saled_price % 10);
                     }
                 }
-
+                
                 data = {
                     img: product[0].img,
                     name: product[0].name,
@@ -245,9 +247,11 @@ router.get('/:product_idx', async (req, res) => {
                     like: product[0].like_count,
                     count: product[0].count,
                     is_adult: product[0].is_adult,
-                    one_hundred_deal_event: product[0].one_hundred_deal_event
+                    one_hundred_deal_event: product[0].one_hundred_deal_event,
+                    is_event: (sale_ratio == 0) ? false : true
                 }
             }
+
             res.status(200).json(utils.successTrue(statusCode.OK, resMessage.READ_SUCCESS, data));
         } catch (err) {
             console.log(err);
