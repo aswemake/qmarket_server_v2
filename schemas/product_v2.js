@@ -99,17 +99,7 @@ const productSchema_v2 = new Schema({
     created_at: {
         type: Date,
         required: true
-    },
-
-    // // 지우기
-    // price: {
-    //     type: Number,
-    //     required: true
-    // },
-    // default_sale_ratio: {
-    //     type: Number,
-    //     required: true
-    // }
+    }
 })
 
 module.exports = mongoose.model('Product_v2', productSchema_v2)
