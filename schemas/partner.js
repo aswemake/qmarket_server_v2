@@ -63,6 +63,11 @@ const partnerSchema = new Schema({
         type: [String],
         required: true
     },
+    // 배송 정보
+    delivery: {
+        type: Object,
+        required: true
+    },
     // 배달비
     delivery_charge: {
         type: [Object],

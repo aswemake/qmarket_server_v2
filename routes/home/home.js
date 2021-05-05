@@ -61,7 +61,7 @@ router.get('/', async (req, res) => {
                     let product = {
                         product_idx: products[i]._id,
                         main_img: products[i].img[0],
-                        detail_name: products[i].detail_name,
+                        detail_name: `${products[i].detail_name} ${(products[i].standard == "0") ? "" : products[i].standard}`,
                         standard: (products[i].standard == "0") ? "-" : products[i].standard,
                         price: price,
                         sale_ratio: Math.floor(sale_ratio * 100),

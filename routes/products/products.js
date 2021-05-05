@@ -167,7 +167,7 @@ router.get('/', async (req, res) => {
                             product_idx: sorted_products[i]._id,
                             main_img: sorted_products[i].img[0],
                             like: sorted_products[i].like_count,
-                            detail_name: sorted_products[i].detail_name,
+                            detail_name: `${sorted_products[i].detail_name} ${(sorted_products[i].standard == "0") ? "" : sorted_products[i].standard}`,
                             standard: (sorted_products[i].standard == "0") ? "-" : sorted_products[i].standard,
                             price: sorted_products[i].price,
                             sale_ratio: Math.floor(sorted_products[i].sale_ratio * 100),
@@ -237,7 +237,7 @@ router.get('/:product_idx', async (req, res) => {
                 data = {
                     img: product[0].img,
                     name: product[0].name,
-                    detail_name: product[0].detail_name,
+                    detail_name: `${product[0].detail_name} ${(product[0].standard == "0") ? "" : product[0].standard}`,
                     standard: (product[0].standard == "0") ? "-" : product[0].standard,
                     price: price,
                     sale_ratio: Math.floor(sale_ratio * 100),
