@@ -93,7 +93,7 @@ router.get('/', async (req, res) => {
                         let product = {
                             name: product_info[0].detail_name,
                             count: order_products[j].count,
-			    price: order_products[j].price,
+			                price: order_products[j].price,
                         };
                         products.push(product);
                     }

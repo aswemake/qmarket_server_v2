@@ -6,8 +6,8 @@ const resMessage = require('../../../../module/response/responseMessage');
 const statusCode = require('../../../../module/response/statusCode');
 const pool = require('../../../../config/dbConfig');
 
-let Product = require('../../../../schemas/product');
-let Category = require('../../../../schemas/category');
+let Product = require('../../../../schemas/product_v2');
+let Category = require('../../../../schemas/category_v2');
 
 router.get('/', async (req, res) => {
     if (!req.signedCookies.user) {
@@ -15,15 +15,7 @@ router.get('/', async (req, res) => {
         res.redirect('../../start');
     } else {
         try {
-            let data = [];
-            let find_category = await Category.find({});
-            for (let i = 0; i < find_category.length; i++) {
-                let category_data = {
-                    name: find_category[i].name,
-                    category_idx: find_category[i]._id,
-                }
-                data.push(category_data)
-            }
+            let data = { partner_idx: req.params };
             res.render('manager/enroll', { data });
         } catch (err) {
             console.log(err);
@@ -43,16 +35,11 @@ router.post('/', async (req, res) => {
         let product_img = [];
         let count = Number(dataset.count);
         let price = Number(dataset.price);
-        let sale_ratio = Number(dataset.sale_ratio)/100;
-        let saled_price;
-        if(sale_ratio == 0){
-            saled_price = price;
-        } else {
-            saled_price = Math.round(price * (1 - sale_ratio) / 10) * 10; 
-        }
+
         let img = 'https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/' + dataset.img[0].trim().replace(/\"/gi, "").replace(/\s/g, '+')
         main_img.push(img);
         console.log(main_img);
+
         for(let i = 0; i < dataset.detail_image.length; i++) {
             if (dataset.detail_image[i] !== undefined) {
                 let img1 = 'https://s3.ap-northeast-2.amazonaws.com/sopt.seongjin.com/' + dataset.detail_image[i].trim().replace(/\"/gi, "").replace(/\s/g, '+')
@@ -60,17 +47,25 @@ router.post('/', async (req, res) => {
             }
         }
         console.log("product image : ", product_img)
+
+        let category_idx = await Category.find({ name : dataset.category }).select({ _id : 1});
+
         const product = new Product({
             img: main_img,
             detail_img: product_img,
+            hashtag: hashtag,
+            events: [],
             name: dataset.name,
             detail_name: dataset.detail_name,
-            price: price,
-            hashtag: hashtag,
-            sale_ratio: sale_ratio,
-            saled_price: saled_price,
-            category_idx: dataset.category_idx,
+            barcode: dataset.barcode,
+            standard: dataset.standard,
+            original_price: price,
+            partner_idx: dataset.partner_idx,
+            category_idx: category_idx,
             count: count,
+            like_count: 0,
+            shared_count: 0,
+            one_hundred_deal_event: false,
             is_adult: false,
             enabled: true,
             created_at: created_at

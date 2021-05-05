@@ -1,24 +1,55 @@
 <!DOCTYPE html>
 <html lang="ko">
 <head>
+    <style>
+        html {
+            height: 100%;
+        }
+
+        body {
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            margin: 0;
+        }
+        body>article {
+            width: 100%;
+            height: 100%;
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .pc {
+            display: none;
+            font-size: 0.4em;
+            font-weight: normal;
+            color: red;
+        }
+    </style>
     <title>큐마켓 관리자</title>
 </head>
 
 <body>
     <div style=" display:flex; flex:1; align-content: center;">
-        <!--<input 
+        <input 
             style="background-color: #E7713F; color: white; border:none; padding:20px; margin-right: 10px; font-size: larger;" 
             type="button" 
             value="낱개 등록" 
-	    onclick="move_enroll('/manager/<%= partner_idx %>/enroll', this)"/>-->
+	    onclick="move_enroll('/manager/<%= data.partner_idx %>/enroll', this)"/>
+        <input 
+            style="background-color: #E7713F; color: white; border:none; padding:20px; margin-right: 10px; font-size: larger;" 
+            type="button" 
+            value="일괄 등록" 
+            onclick="move_enroll('/manager/<%= data.partner_idx %>/enroll_excel', this)"/>
         <input 
             style="background-color: #E7713F; color: white; border:none; padding:20px;  font-size: larger;" 
             type="button" 
-            value="일괄 등록" 
-            onclick="move_enroll('/manager/<%= partner_idx %>/enroll_excel', this)"/>
+            value="할인상품 등록"/>
     </div>
     <article>
-        <iframe style="border: none; display:flex; flex:1; width: 100%; height:1000px" id="content" src="/manager/<%= partner_idx %>/enroll_excel"></iframe>
+        <iframe id="content" src="/manager/<%= data.partner_idx %>/enroll"></iframe>
     </article>
 
     <script>

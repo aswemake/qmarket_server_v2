@@ -8,7 +8,7 @@ const statusCode = require('../../../../module/response/statusCode');
 let Product = require('../../../../schemas/product_v2');
 let Category = require('../../../../schemas/category_v2');
 
-//products_frame load - 여기서 카테고리 정보 싹 가져와야할듯
+//재고관리, 일괄 수정 고르는 부분 render
 router.get('/form', async (req, res) => {
     if (!req.signedCookies.user) {
         console.log("쿠키가 만료되었거나 로그인이 필요합니다.");
@@ -28,9 +28,29 @@ router.get('/form', async (req, res) => {
         }
     }
 })
+//재고관리 윗부분 render
+router.get('/management_form', async (req, res) => {
+    if (!req.signedCookies.user) {
+        console.log("쿠키가 만료되었거나 로그인이 필요합니다.");
+        res.redirect('../../../start');
+    } else {
+        const { partner_idx } = req.params;
+        if (!partner_idx) {
+            res.status(200).json(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
+        } else {
+            try {
+                let data = { partner_idx: partner_idx };
+                res.render('manager/product_management_frame', { data });
+            } catch (err) {
+                console.log(err);
+                res.status(200).json(utils.successFalse(statusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR));
+            }
+        }
+    }
+})
 
 // 상품 리스트 조회 API
-router.get('/', async (req, res) => {
+router.get('/management', async (req, res) => {
     if (!req.signedCookies.user) {
         console.log("쿠키가 만료되었거나 로그인이 필요합니다.");
         res.redirect('../../../start');
@@ -51,24 +71,24 @@ router.get('/', async (req, res) => {
                 let data = { current_page_num: parseInt(page), last_page_num: 0, partner_idx: partner_idx, products: [], current_category: category, current_keyword: keyword};
                 // 검색 키워드와 카테고리가 모두 설정되지 않은 경우
                 if (!keyword && !category) {
-                    products = await Product.find({ partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, event: 1, count: 1, category_idx: 1}).sort({ created_at: -1 });
+                    products = await Product.find({ partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1, category_idx: 1}).sort({ created_at: -1 });
                     
                 }
                 // 검색 키워드가 존재할 경우 키워드가 포함된 모든 상품 리스트 출력
                 else if (keyword && !category) {
-                    products = await Product.find({ detail_name: { $regex: keyword }, partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, event: 1, count: 1, category_idx: 1}).sort({ created_at: -1 });
+                    products = await Product.find({ detail_name: { $regex: keyword }, partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1, category_idx: 1}).sort({ created_at: -1 });
                 }
                 // 카테고리가 설정된 경우 카테고리를 기준으로 검색된 모든 상품 리스트 출력
                 else if (!keyword && category) {
                     category_idx = await Category.find({ name: category }).select({ _id: 1 }).sort({ created_at: -1 });
                     console.log("category_idx : " + category_idx)
-                    products = await Product.find({ category_idx: category_idx, partner_idx: partner_idx, enabled: true, one_hundres_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, event: 1, count: 1 }).sort({ created_at: -1 });
+                    products = await Product.find({ category_idx: category_idx, partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1 }).sort({ created_at: -1 });
                 }
                 // 검색 키워드와 카테고리가 모두 설정된 경우
                 else {
                     category_idx = await Category.find({ name: category }).select({ _id: 1 }).sort({ created_at: -1 });
                     console.log("category_idx : " + category_idx)
-                    products = await Product.find({ detail_name: { $regex: keyword }, category_idx: category_idx, partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, event: 1, count: 1 }).sort({ created_at: -1 });
+                    products = await Product.find({ detail_name: { $regex: keyword }, category_idx: category_idx, partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1 }).sort({ created_at: -1 });
                 }
 
                 // offset, count 설정
@@ -99,9 +119,29 @@ router.get('/', async (req, res) => {
                 data.last_page_num = (products.length % default_count == 0) ? Math.floor(products.length / default_count) : Math.floor(products.length / default_count) + 1;
                 console.log("data.current_page_num : " + data.current_page_num);
                 console.log("data.last_page_num : " + data.last_page_num);
-                res.render('manager/products', { data });
+                res.render('manager/products_management', { data });
             } catch (err) {
                 console.log(err.message);
+                res.status(200).json(utils.successFalse(statusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR));
+            }
+        }
+    }
+})
+//일괄 수정 api
+router.get('/batch_management', async (req, res) => {
+    if (!req.signedCookies.user) {
+        console.log("쿠키가 만료되었거나 로그인이 필요합니다.");
+        res.redirect('../../../start');
+    } else {
+        const { partner_idx } = req.params;
+        if (!partner_idx) {
+            res.status(200).json(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
+        } else {
+            try {
+                let data = { partner_idx: partner_idx };
+                res.render('manager/product_batch_management', { data });
+            } catch (err) {
+                console.log(err);
                 res.status(200).json(utils.successFalse(statusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR));
             }
         }

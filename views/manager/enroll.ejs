@@ -114,9 +114,13 @@
 
 <body>
     <div style="display: flex; flex-direction: row;">
-        <h1>상품 등록<span style="font-size: 12px; color: #E7713F;">  *PC에 최적화 되어 있습니다.</span></h1>
+        <h1>상품 단일 등록<span style="font-size: 12px; color: #E7713F;">  *PC에 최적화 되어 있습니다.</span></h1>
     </div>
     <div style="display: flex; flex-direction: column;">
+        <div style="display: flex; flex-direction: row; flex: 1; margin: 20px; align-items: center;">
+            <a style="width: 15%; font-size: medium;">바코드</a>
+            <input id="barcode" style="width: 50%; height: 40px; padding:10px;" type="text" placeholder="바코드 번호를 입력해 주세요"/>
+        </div>
         <div style="display: flex; flex-direction: row; flex: 1; margin: 20px; align-items: center;">
             <a style="width: 15%; font-size: medium;">상품 이름</a>
             <input id="detail_name" style="width: 50%; height: 40px; padding:10px;" type="text" placeholder="상품 이름을 입력해 주세요"/>
@@ -126,29 +130,30 @@
             <input id="name"  style="width: 50%; height: 40px; padding:10px;" type="text" placeholder="상품 브랜드 이름을 입력해 주세요"/>
         </div>
         <div style="display: flex; flex-direction: row; flex: 1; margin: 20px; align-items: center;">
-            <a style="width: 15%; font-size: medium; flex-wrap: wrap; padding:10px;">상품 카테고리</a>
-            <div class="dropdown">
-                <input type="button" class="dropbtn" id="category" value="카테고리 선택"/>
-                <div class="dropdown-content">
-                    <a onclick="setCategory('카테고리 선택', '')">
-                        카테고리 선택
-                    </a>
-                    <% for(let i=0;i < data.length; i++) { %>
-                        <a onclick="setCategory('<%= data[i].name %>', '<%= data[i].category_idx %>')">
-                            <%= data[i].name %>
-                        </a>
-                    <% } %>
-                </div>
-                
+            <a style="width: 15%; font-size: medium; flex-wrap: wrap;">규격</a>
+            <input id="standard"  style="width: 50%; height: 40px; padding:10px;" type="text" placeholder="규격을 입력해 주세요"/>
+        </div>
+        <div style="display: flex; flex-direction: row; flex: 1; margin: 20px; align-items: center;">
+            <a style="width: 15%; font-size: medium; flex-wrap: wrap;">상품 카테고리</a>
+            <div style="align-self: center;">
+                <select style="width:200px; text-align-last: center;" id="parent_category" onchange="child_category_change(this)">
+                    <option value="1">신선식품</option>
+                    <option value="2">가정 간편식</option>
+                    <option value="3">생활용품</option>
+                    <option value="4">기타</option>
+                    <option value="5">우리동네가게</option>
+                </select>
+                <select style="width:200px; text-align-last: center;" id="child_category" onchange="grand_child_category_change(this)">
+                    <option value="1">정육/계란</option>
+                </select>
+                <select style="width:200px; text-align-last: center;" id="grand_child_category">
+                    <option value="1">돼지고기</option>
+                </select>
             </div>
         </div>
         <div style="display: flex; flex-direction: row; flex: 1; margin: 20px; align-items: center;">
-            <a style="width: 15%; font-size: medium;">상품 원가</a>
+            <a style="width: 15%; font-size: medium;">상품 가격</a>
             <input id="price"  style="width: 50%; height: 40px; padding:10px;" type="number" placeholder="상품 가격을 입력해 주세요"/>
-        </div>
-        <div style="display: flex; flex-direction: row; flex: 1; margin: 20px; align-items: center;">
-            <a style="width: 15%; font-size: medium;">상품 할인율(%)</a>
-            <input id="sale_ratio"  style="width: 50%; height: 40px; padding:10px;" type="number" placeholder="상품 할인율을 입력해 주세요(0 ~ 100 사이의 값 입력)"/>
         </div>
         <div style="display: flex; flex-direction: row; flex: 1; margin: 20px; align-items: center;">
             <a style="width: 15%; font-size: medium;">상품 최초 재고</a>
@@ -175,7 +180,7 @@
         </div>
         <div style="display: flex; flex-direction: column;">
             <input style="background-color:#E0713F; border:none; color:white; font-size: large; padding: 10px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2) ;" 
-            onclick="enrollProduct()" style="margin: 20px;" type="button" value="상품 등록하기"/>
+            onclick="enrollProduct('<%= data.partner_idx %>')" style="margin: 20px;" type="button" value="상품 등록하기"/>
         </div>
     </div>
     <script src="/javascripts/myScript.js"></script>
@@ -189,20 +194,25 @@
         }
     </script>
     <script>
-        let category_id = "";
         let image_detail = [];
         let image_main = [];
         let hashtag = [];
-        async function enrollProduct() {
+        let category = document.getElementById("grand_child_category");
+
+        async function enrollProduct(idx) {
             var files = document.getElementById("image_main").files;
             var filesdetail = document.getElementById("image_detail").files;
+            let partner_idx = idx;
+            if(document.getElementById('barcode').value == "") {
+                return alert("바코드 번호를 입력해 주세요.");
+            }
             if(document.getElementById('detail_name').value == "") {
                 return alert("상품 이름를 입력해 주세요.");
             }
             if(document.getElementById('name').value == "") {
                 return alert("상품 브랜드를 입력해 주세요.");
             }
-            if(category_id == "") {
+            if(category.options[category.selectedIndex].text == "") {
                 return alert("카테고리를 선택해 주세요.");
             }
             if(document.getElementById('count').value == "") {
@@ -211,20 +221,16 @@
             if(document.getElementById('price').value == "") {
                 return alert("상품 가격을 입력해 주세요.");
             }
-            if(document.getElementById('sale_ratio').value == "") {
-                return alert("상품 할인율을 입력해 주세요.");
-            }
-            if(document.getElementById('sale_ratio').value == "") {
-                return alert("상품 해시태그를 입력해 주세요.");
-            }
             if (!files.length) {
                 return alert("이미지를 업로드해 주세요.");
             }
             if (!files.length) {
                 return alert("이미지를 업로드해 주세요.");
             }
-            hashtag = document.getElementById('hashtag').value.split(",");
-            console.log('hashtag : ', hashtag);
+            if(document.getElementById('hashtag').value != ""){
+                hashtag = document.getElementById('hashtag').value.split(",");
+                console.log('hashtag : ', hashtag);
+            }
             image_main.push(document.getElementById('image_main').files[0].name);
             for(var i = 0; i < filesdetail.length; i++) {
                 let file = filesdetail[i];
@@ -233,15 +239,17 @@
             if (confirm("상품을 등록하시겠습니까?")) {
                 console.log(document.getElementById("image_main"))
                 var dataset = {
-                    name:document.getElementById('name').value,
-                    detail_name:document.getElementById('detail_name').value,
-                    category_idx:category_id,
-                    img:image_main,
-                    detail_image:image_detail,
-                    sale_ratio:document.getElementById('sale_ratio').value,
-                    count:document.getElementById('count').value,
-                    hashtag:hashtag,
-                    price:document.getElementById('price').value,
+                    img: image_main,
+                    detail_image: image_detail,
+                    hashtag: hashtag,
+                    name: document.getElementById('name').value,
+                    detail_name: document.getElementById('detail_name').value,
+                    barcode: document.getElementById('barcode').value,
+                    partner_idx: partner_idx,
+                    category: category.options[category.selectedIndex].text,
+                    standard: document.getElementById('standard').value,
+                    count: document.getElementById('count').value,
+                    price: document.getElementById('price').value,
                 }
                 console.log("dataset : ", dataset);
                 var xhttp = new XMLHttpRequest()
@@ -250,8 +258,8 @@
                         console.log("상품 등록 성공");
                     }
                 }
-
-                xhttp.open("POST", "/admin/product/inventory/enroll", true)
+                let url = "/manager/" + partner_idx + "/enroll";
+                xhttp.open("POST", url, true)
                 xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
                 xhttp.send("dataset=" + JSON.stringify(dataset))
 

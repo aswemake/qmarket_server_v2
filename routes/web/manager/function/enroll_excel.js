@@ -25,7 +25,7 @@ router.get('/', async (req, res) => {
         res.redirect('../../../start');
     } else {
         try {
-            let data = [];
+            let data = { partner_idx : req.params };
             res.render('manager/enroll_excel', { data });
         } catch (err) {
             console.log(err);
