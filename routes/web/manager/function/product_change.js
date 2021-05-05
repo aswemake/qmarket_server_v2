@@ -23,23 +23,9 @@ router.put('/price', async (req, res) => {
             res.status(200).json(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
         } else {
             try {
-                let default_sale_ratio = 0;
-                if (0<=price && price<=999) default_sale_ratio = 0.083;
-                else if (1000<=price && price<=2999) default_sale_ratio = 0.183;
-                else if (3000<=price && price<=4999) default_sale_ratio = 0.158;
-                else if (5000<=price && price<=9999) default_sale_ratio = 0.166;
-                else if (10000<=price && price<=19999) default_sale_ratio = 0.166;
-                else if (20000<=price && price<=49999) default_sale_ratio = 0.176;
-                else if (50000<=price && price<=99999) default_sale_ratio = 0.166;
-                else if (100000<=price && price<=299999) default_sale_ratio = 0.183;
-                else if (300000<=price && price<=499999) default_sale_ratio = 0.233;
-                else if (500000<=price) default_sale_ratio = 0.333
-                // 가라 가격 설정
-                let modifed_price = Math.floor(price / (1 - default_sale_ratio));
-                modifed_price = (modifed_price - (modifed_price % 10)); // 1의 자리 제거
                 let update_price = 
                     await Product.updateOne({ _id: product_id }, 
-                        {$set:{original_price:price, price:modifed_price, default_sale_ratio:default_sale_ratio}});
+                        {$set:{original_price:price}});
 
                 console.log(update_price);
                 if (update_price.nModified === 1) {

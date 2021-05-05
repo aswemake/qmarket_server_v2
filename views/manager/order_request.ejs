@@ -63,7 +63,13 @@
             } else e.nextElementSibling.classList.add("hidden");
         }
     </script>
-    <h1>
+    <script>
+        window.setTimeout(() => {
+            console.log('주기적 reload');
+            window.location.reload()
+        }, 180000);
+    </script>
+    <h1>주문확인
         <span style="font-size: 12px; color: #E7713F;">*클릭 시 상세 정보를 확인할 수 있습니다.</span>
         <span style="font-size: 12px; color: #E7713F;">*승인된 주문건은 배송탭에서 보실 수 있습니다.</span>
         <span style="font-size: 12px; color: #E7713F;">*주문승인 시 영수증도 출력됩니다.</span>
@@ -77,7 +83,7 @@
                 <td style="width : 95%">
                 </td>
                 <td>
-                    <input type="button" value="주문승인" onclick="approve_checked_boxes('<%= JSON.stringify(data) %>')"></button>
+                    <input type="button" value="주문승인" onclick="temp('<%= JSON.stringify(data) %>')"></button>
                 </td>
                 <td>
                     <input type="button" value="주문거절" onclick="reject_checked_boxes('<%= JSON.stringify(data) %>')"></button>
@@ -191,6 +197,9 @@
     </table>
     <script src="/javascripts/myScript.js"></script>
     <script>
+        async function temp(i){
+            await approve_checked_boxes(i)
+        }
         function boxes_check(){
             let checked = false;
             var boxes = document.getElementsByName("target_box");

@@ -363,7 +363,7 @@ function grand_child_category_change(category2){
 //상품 검색
 function products_search(partner_id, obj){
 
-    var URL = "/manager/" + partner_id + "/products?page=1";
+    var URL = "/manager/" + partner_id + "/products/management?page=1";
     var keyword = document.getElementById("search");
     var category1 = document.getElementById("parent_category");
     var category2 = document.getElementById("child_category");
@@ -393,7 +393,7 @@ function products_search(partner_id, obj){
 
 function products_move_page(partner_id, current_category, current_keyword, a_tag){
     var num = a_tag.text.replace(/(\s*)/g, "")
-    var URL = "/manager/" + partner_id + "/products?page=" + num;
+    var URL = "/manager/" + partner_id + "/products/management?page=" + num;
     
     var keyword = current_keyword;
     var category = current_category;
@@ -434,10 +434,12 @@ function renameKey(obj, oldKey, newKey) {
     delete obj[oldKey];
 }
 
-async function sendExcelFile() {
+async function sendExcelFile(idx) {
     try {
         let input = document.getElementById('product_excel');
         let reader = new FileReader();
+        let partner_idx = idx;
+        let url = "/manager/" + partner_idx + "/enroll_excel";
         reader.onload = function () {
             let data = reader.result;
             let workBook = XLSX.read(data, { type: 'binary' });
@@ -467,7 +469,7 @@ async function sendExcelFile() {
                             alert('상품이 성공적으로 등록되었습니다.')
                         }
                     }
-                    xhttp.open("POST", "/manager/product/inventory/enroll_excel", true)
+                    xhttp.open("POST", url, true)
                     xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
                     xhttp.send("file=" + JSON.stringify(rows));
                     //window.location.reload()

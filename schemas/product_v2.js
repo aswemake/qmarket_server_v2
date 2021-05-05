@@ -38,16 +38,6 @@ const productSchema_v2 = new Schema({
         type: Number,
         required:true
     },
-    // 기본할인으로 상승된 가격
-    price: {
-        type: Number,
-        required:true
-    },
-    // 기본할인율
-    default_sale_ratio: {
-        type: Number,
-        required:true
-    },
     // 해시태그
     hashtag: {
         type: [String],
@@ -109,7 +99,7 @@ const productSchema_v2 = new Schema({
     created_at: {
         type: Date,
         required: true
-    },
+    }
 })
 
 module.exports = mongoose.model('Product_v2', productSchema_v2)

@@ -17,6 +17,9 @@
 </head>
 
 <body>
+    <div style="display: flex; flex-direction: row;">
+        <h1>상품 일괄 등록<span style="font-size: 12px; color: #E7713F;">  *PC에 최적화 되어 있습니다.</span></h1>
+    </div>
     <div>
         <a style="width: 15%; font-size: medium;  margin-right: 10px;">엑셀 파일 첨부</a>
         <label class="input-file-button" for="product_excel">파일 첨부</label>
@@ -27,7 +30,7 @@
     </div>
     <input name="excel"
         style="background-color:#E0713F; border:none; color:white; font-size: large; padding: 10px; box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2) ;"
-        type="button" onclick="sendExcelFile()" value="상품 등록하기" />
+        type="button" onclick="sendExcelFile(data.partner_idx)" value="상품 등록하기" />
     <script src="/javascripts/myScript.js"></script>
     <!-- <script>
         function onfilechange(file, id) {

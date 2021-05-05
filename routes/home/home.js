@@ -19,9 +19,8 @@ router.get('/', async (req, res) => {
         try {
             let data = new Object();
             let banners = [];
-            const recommend_products_count = 20; // 추천 상품 리스트 갯수
-            const best_sale_produdcts_count = 5; // 판매순 상품 리스트 갯수
-            const one_hundred_deal_event_products_count = 6; // 100원딜 상품 리스트 갯수
+            const event_products_count = 20; // 추천 상품 리스트 갯수
+            const one_hundred_deal_event_products_count = 10; // 100원딜 상품 리스트 갯수
             const latest_products_count = 4; // 최신 상품 리스트 갯수
             const start_index = 0; // 상품 검색 시작 인덱스
 
@@ -30,42 +29,47 @@ router.get('/', async (req, res) => {
                 let result = [];
                 for (let i = 0; i < products.length; i++) {
                     // 가격 계산
-                    let price = 0, sale_ratio = 0, saled_price = 0;
+                    let price = products[i].original_price, sale_ratio = 0, saled_price = 0;
                     // 100원 딜 이벤트 상품인 경우
-                    if (products[i].one_hundred_deal_event) {
-                        price = products[i].price; sale_ratio = 0.99; saled_price = 100;
-                    } else { 
-                        // 기본 할인 적용
-                        if (products[i].events.length == 0) {
-                            price = products[i].price;
-                            sale_ratio = products[i].default_sale_ratio;
-                        }
-                        // 기본 할인 적용 안함
-                        else {
-                            price = products[i].original_price;
-                            for (let j = 0; j < products[i].events.length; j++) {
-                                let current_date = new Date(Date.now() + (3600000 * 9));
-                                if (products[i].events[j].start_date.getTime() <= current_date.getTime() && current_date.getTime() <= products[i].events[j].end_date.getTime())
-                                    sale_ratio += products[i].events[j].sale_ratio;
-                                if (sale_ratio >= 1) {
-                                    sale_ratio = 0.99; break;
-                                }
+                    if (products[i].one_hundred_deal_event) { sale_ratio = 0.99; saled_price = 100;} 
+                    else {
+                        // sale_ratio 계산
+                        let current_date = new Date(Date.now() + (3600000 * 9));
+                        for (let j = 0; j < products[i].events.length; j++) {
+                            if (products[i].events[j].start_date.getTime() <= current_date.getTime() && current_date.getTime() <= products[i].events[j].end_date.getTime()) {
+                                sale_ratio += products[i].events[j].sale_ratio;
+                            }
+                            if (sale_ratio >= 1) {
+                                sale_ratio = 0.99; break;
                             }
                         }
-                        saled_price = Math.floor(price * (1 - sale_ratio));
-                        saled_price = saled_price - (saled_price % 10);
+
+                        // 기본 할인 적용 (상생 지원금 3.3%만큼 할인)
+                        if (sale_ratio == 0) {
+                            const default_sale_ratio = 0.033;
+                            price = Math.floor(price * (1 - default_sale_ratio));
+                            price = price - (price % 10);
+                            saled_price = price;
+                        }
+                        // 이벤트 할인 상품인 경우
+                        else {
+                            saled_price = Math.floor(price * (1 - sale_ratio));
+                            saled_price = saled_price - (saled_price % 10);
+                        }
                     }
+
                     let product = {
                         product_idx: products[i]._id,
                         main_img: products[i].img[0],
-                        detail_name: products[i].detail_name,
+                        detail_name: `${products[i].detail_name} ${(products[i].standard == "0") ? "" : products[i].standard}`,
                         standard: (products[i].standard == "0") ? "-" : products[i].standard,
                         price: price,
                         sale_ratio: Math.floor(sale_ratio * 100),
                         saled_price: saled_price,
                         is_adult: products[i].is_adult,
                         like: products[i].like_count,
-                        one_hundred_deal_event: products[i].one_hundred_deal_event
+                        one_hundred_deal_event: products[i].one_hundred_deal_event,
+                        is_event: (sale_ratio == 0) ? false : true
                     }
                     result.push(product);
                 }
@@ -93,15 +97,29 @@ router.get('/', async (req, res) => {
                 // parnter_idx 변수 저장
                 let partner_idx = partner[0]._id;
                 
-                // [이 상품은 어떠세요?] -> 랜덤으로 상품 recommend_products_count개 출력
-                let recommend_products = await Product.aggregate([ { $match: { partner_idx: partner_idx, one_hundred_deal_event: false, enabled: true } }, { $sample: { size: recommend_products_count } } ]);
-                recommend_products = await set_response_format(recommend_products);
-                
-                // [많이 팔렸어요 Best 5] -> saled_count 내림차순 정렬 후 best_sale_produdcts_count개 출력
-                let best_sale_produdcts = await Product.find({ partner_idx: partner_idx, one_hundred_deal_event: false, enabled: true }).sort({ saled_count: -1 }).skip(start_index).limit(best_sale_produdcts_count);
-                best_sale_produdcts = await set_response_format(best_sale_produdcts);
+                // [초특가 전단상품] -> 이벤트하고 있는 상품들 recommend_products_count개 랜덤 출력
+                let current_date = new Date(Date.now() + (3600000 * 9));
+                let event_products = await Product.aggregate([ 
+                                                                { 
+                                                                    $match: { 
+                                                                        partner_idx: partner_idx, 
+                                                                        one_hundred_deal_event: false, 
+                                                                        enabled: true, 
+                                                                        events: {
+                                                                            $exists: true,
+                                                                            $type: 'array',
+                                                                            $ne: [],
+                                                                            $elemMatch: {
+                                                                                'start_date': { $lte: current_date },
+                                                                                'end_date': { $gte: current_date }
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                { $sample: { size: event_products_count } } ]);
+                event_products = await set_response_format(event_products);
 
-                // 100원딜 찬스
+                // [100원딜 찬스] -> 100원딜 이벤트 상품 one_hundred_deal_event_products_count개 출력
                 let one_hundred_deal_event_products = await Product.aggregate([ { $match: { partner_idx: partner_idx, one_hundred_deal_event: true, enabled: true } }, { $sample: { size: one_hundred_deal_event_products_count } } ]);
                 one_hundred_deal_event_products = await set_response_format(one_hundred_deal_event_products);
                 
@@ -111,9 +129,8 @@ router.get('/', async (req, res) => {
                 
                 data = {
                     banner: banners,
-                    recommend: recommend_products,
-                    best: best_sale_produdcts,
-                    event: one_hundred_deal_event_products,
+                    mart_event: event_products,
+                    one_hundred_deal_event: one_hundred_deal_event_products,
                     latest: latest_products
                 }
                 res.status(200).json(utils.successTrue(statusCode.OK, resMessage.READ_SUCCESS, data));
