@@ -15,6 +15,12 @@ const jwt = require('../../module/jwt');
 const Product = require('../../schemas/product_v2');
 const Coupon = require('../../schemas/coupon');
 const Coupon_User = require('../../schemas/coupon_user');
+const Partner = require('../../schemas/partner');
+
+//알림톡 보내기 위한 모듈 
+const HMACSHA256 = require('crypto-js/hmac-sha256')
+const BASE64 = require('crypto-js/enc-base64')
+
 
 // 결제 성공 API
 router.post('/', jwt.isLoggedIn, async (req, res) => {
@@ -194,6 +200,58 @@ router.post('/', jwt.isLoggedIn, async (req, res) => {
                         .then(response => { console.log("성공"); })
                         .catch(error => { console.log("실패"); })
 
+
+                        /* 유저에게 알림톡 보내기 */
+                        let product_info = await Product.find({_id:product[0].product_idx});
+                        let partner_info = await Partner.find({_id:partner_idx})
+                        console.log(new Date(parseInt(merchant_uid.substring(4))).getDate());
+                        const date = new Date(parseInt(merchant_uid.substring(4)));
+                        let product_name = product_info[0].detail_name;
+                        if(product.length > 1) {
+                            product_name = product_info[0].detail_name + '외 ' + (product.length - 1) + '개';
+                        }
+                        const dateform = date.getFullYear() + "년 "
+                        + (date.getMonth() + 1) + "월 " 
+                        + date.getDate() + "일 "
+                        + date.getHours() + "시 "
+                        + date.getMinutes() + "분";
+                        const subMessage = pay_method
+                        const buyMessage = `${receiver} 님의 상품구매가 완료되었습니다.\n\n` +
+                        `${date.getHours() < 17 ? "늦어도 " + + (date.getHours() + 4) + "시 이내 배송 예정입니다." : 
+                        date.getHours() < 9 ? "금일 오전 9시부터 배송이 시작되며, 늦어도 점심 전까지 가져다 드릴게요" :
+                        "금일 배송 주문은 마감되어 익일 배송 예정입니다."}\n\n* 거주지역에 따라 예상도착시간이 달라질 수 있으며 앱 내 마이페이지-MY마트에서 배송 정보를 자세히 확인하실 수 있습니다.\n\n` +
+                        `주문 상품 내역\n\n` +
+                        `- 상품명 : ${product_name}\n` +
+                        `- 주문마트 : ${partner_info[0].name}\n` +
+                        `- 결제일시 : ${dateform}\n` +
+                        `- 결제금액 : ${price + '원'}\n` +
+                        `- 결제수단 : ${subMessage}`
+                        const uri = "/alimtalk/v2/services/" + process.env.ALIMTALK_API_SERVICE_ID + "/messages";
+                        const timestamp = new Date(Date.now()).getTime().toString();
+                        var hmac = HMACSHA256("POST " + uri + "\n" + timestamp + "\n" + process.env.ALIMTALK_API_ACCESS_KEY, process.env.ALIMTALK_API_SECRET_KEY);
+                        console.log(hmac.toString(BASE64));
+                        var hmac_result = hmac.toString(BASE64);
+                        console.log("testContent : ", buyMessage);
+                        axios.post("https://sens.apigw.ntruss.com/alimtalk/v2/services/" +  process.env.ALIMTALK_API_SERVICE_ID + "/messages", {
+                            "templateCode": process.env.ALIMTALK_API_TEMPLATE_CODE_QMARKET,
+                            "plusFriendId": "@큐마켓",
+                            "messages": [
+                                {
+                                    "countryCode": "82",
+                                    "to": phone,
+                                    "content": buyMessage,
+                                }
+                            ],
+                        },{
+                            headers:{
+                                "Content-Type": "application/json; charset=utf-8",
+                                "x-ncp-apigw-timestamp":timestamp,
+                                "x-ncp-iam-access-key": process.env.ALIMTALK_API_ACCESS_KEY,
+                                "x-ncp-apigw-signature-v2": hmac_result,
+                            }
+                        }).then(response => {
+                            console.log("response : ", response)
+                        }) 
 
                         /* 모든 작업 완료 */
                         await connection.commit();
