@@ -6,7 +6,7 @@ const resMessage = require('../../../module/response/responseMessage');
 const statusCode = require('../../../module/response/statusCode');
 const jwt = require('../../../module/jwt');
 
-let Product = require('../../../schemas/product');
+let Product = require('../../../schemas/product_v2');
 let Review = require('../../../schemas/review');
 let Like = require('../../../schemas/like');
 
@@ -31,7 +31,8 @@ router.get('/', jwt.isLoggedIn, async (req, res) => {
                         score: review[i].score,
                         content: review[i].content,
                         created_at: review[i].created_at,
-                        like: count_like
+                        like: count_like,
+                        img: review[i].img[0]
                     }
                     review_arr.push(data);
                 }
