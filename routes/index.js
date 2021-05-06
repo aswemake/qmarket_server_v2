@@ -7,8 +7,6 @@ router.use('/party', require('./party'));
 router.use('/product', require('./product'));
 router.use('/payment', require('./payment'));
 router.use('/mypage', require('./mypage'));
-router.use('/insert_data', require('./insert_data'));
-//router.use('/', require('./web'));
 router.use('/', require('./web'));
 router.use('/schedule', require('./schedule'));
 router.use('/category', require('./category'));

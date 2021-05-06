@@ -33,35 +33,36 @@ router.get('/', async (req, res) => {
                     // 가격 계산
                     let price = products[i].original_price, sale_ratio = 0, saled_price = 0;
                     // 100원 딜 이벤트 상품인 경우
-                    if (products[i].one_hundred_deal_event) { sale_ratio = 0.99; saled_price = 100;} 
+                    if (products[i].one_hundred_deal_event) { sale_ratio = 99; saled_price = 100; } 
                     else { 
-                        // sale_ratio 계산
+                        await products[i].events.sort(function (a, b) { return a.saled_price - b.saled_price; })
                         let current_date = new Date(Date.now() + (3600000 * 9));
                         for (let j = 0; j < products[i].events.length; j++) {
                             if (products[i].events[j].start_date.getTime() <= current_date.getTime() && current_date.getTime() <= products[i].events[j].end_date.getTime()) {
-                                sale_ratio += products[i].events[j].sale_ratio;
-                            }
-                            if (sale_ratio >= 1) {
-                                sale_ratio = 0.99; break;
+                                saled_price = products[i].events[j].saled_price; break;
                             }
                         }
-
-                        // 기본 할인 적용 (상생 지원금 3.3%만큼 할인)
-                        if (sale_ratio == 0) {
+                        
+                        // 기본 할인 상품 (상생지원금 3.3%만큼 할인)
+                        if (products[i].events.length < 1 || saled_price == 0) { // 이벤트가 없거나 현재 진행중인 이벤트가 없을 경우
                             const default_sale_ratio = 0.033;
                             price = Math.floor(price * (1 - default_sale_ratio));
                             price = price - (price % 10);
                             saled_price = price;
                         }
-                        // 이벤트 할인 상품인 경우
+                        // 이벤트 할인 상품
                         else {
-                            saled_price = Math.floor(price * (1 - sale_ratio));
-                            saled_price = saled_price - (saled_price % 10);
+                            sale_ratio = Math.floor(((price - saled_price) / price) * 100);
                         }
                     }
+
+                    // is_event 설정
+                    let is_event = (products[i].one_hundred_deal_event == false && sale_ratio > 0) ? true : false;
+
                     products[i].price = price;
                     products[i].sale_ratio = sale_ratio;
                     products[i].saled_price = saled_price;
+                    products[i].is_event = is_event;
                 }
                 return products;
             }
@@ -170,11 +171,11 @@ router.get('/', async (req, res) => {
                             detail_name: `${sorted_products[i].detail_name} ${(sorted_products[i].standard == "0") ? "" : sorted_products[i].standard}`,
                             standard: (sorted_products[i].standard == "0") ? "-" : sorted_products[i].standard,
                             price: sorted_products[i].price,
-                            sale_ratio: Math.floor(sorted_products[i].sale_ratio * 100),
+                            sale_ratio: sorted_products[i].sale_ratio,
                             saled_price: sorted_products[i].saled_price,
                             is_adult: sorted_products[i].is_adult,
                             one_hundred_deal_event: sorted_products[i].one_hundred_deal_event,
-                            is_event: (sorted_products[i].sale_ratio == 0) ? false : true
+                            is_event: sorted_products[i].is_event
                         }
                         final_products.push(final_product);
                     }
@@ -206,33 +207,31 @@ router.get('/:product_idx', async (req, res) => {
                 // 가격 계산
                 let price = product[0].original_price, sale_ratio = 0, saled_price = 0;
                 // 100원 딜 이벤트 상품인 경우
-                if (product[0].one_hundred_deal_event) { sale_ratio = 0.99; saled_price = 100;} 
+                if (product[0].one_hundred_deal_event) { sale_ratio = 99; saled_price = 100; } 
                 else { 
-                    // sale_ratio 계산
+                    await product[0].events.sort(function (a, b) { return a.saled_price - b.saled_price; })
                     let current_date = new Date(Date.now() + (3600000 * 9));
-                    
                     for (let i = 0; i < product[0].events.length; i++) {
                         if (product[0].events[i].start_date.getTime() <= current_date.getTime() && current_date.getTime() <= product[0].events[i].end_date.getTime()) {
-                            sale_ratio += product[0].events[i].sale_ratio;
-                        }
-                        if (sale_ratio >= 1) {
-                            sale_ratio = 0.99; break;
+                            saled_price = product[0].events[i].saled_price; break;
                         }
                     }
-                    
-                    // 기본 할인 적용 (상생 지원금 3.3%만큼 할인)
-                    if (sale_ratio == 0) {
+
+                    // 기본 할인 상품 (상생지원금 3.3%만큼 할인)
+                    if (product[0].events.length < 1 || saled_price == 0) { // 이벤트가 없거나 현재 진행중인 이벤트가 없을 경우
                         const default_sale_ratio = 0.033;
                         price = Math.floor(price * (1 - default_sale_ratio));
                         price = price - (price % 10);
                         saled_price = price;
                     }
-                    // 이벤트 할인 상품인 경우
+                    // 이벤트 할인 상품
                     else {
-                        saled_price = Math.floor(price * (1 - sale_ratio));
-                        saled_price = saled_price - (saled_price % 10);
+                        sale_ratio = Math.floor(((price - saled_price) / price) * 100);
                     }
                 }
+
+                // is_event 설정
+                let is_event = (product[0].one_hundred_deal_event == false && sale_ratio > 0) ? true : false;
                 
                 data = {
                     img: product[0].img,
@@ -240,7 +239,7 @@ router.get('/:product_idx', async (req, res) => {
                     detail_name: `${product[0].detail_name} ${(product[0].standard == "0") ? "" : product[0].standard}`,
                     standard: (product[0].standard == "0") ? "-" : product[0].standard,
                     price: price,
-                    sale_ratio: Math.floor(sale_ratio * 100),
+                    sale_ratio: sale_ratio,
                     saled_price: saled_price,
                     detail_img: product[0].detail_img,
                     shared_count: product[0].shared_count,
@@ -248,7 +247,7 @@ router.get('/:product_idx', async (req, res) => {
                     count: product[0].count,
                     is_adult: product[0].is_adult,
                     one_hundred_deal_event: product[0].one_hundred_deal_event,
-                    is_event: (sale_ratio == 0) ? false : true
+                    is_event: is_event
                 }
             }
 
