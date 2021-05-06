@@ -96,4 +96,33 @@ router.put('/enabled', async (req, res) => {
         }
     }
 })
+
+router.put('/batch_management', async (req, res) => {
+    if (!req.signedCookies.user) {
+        console.log("쿠키가 만료되었거나 로그인이 필요합니다.");
+        res.redirect('../../../start');
+    } else {
+        try {
+            let file = JSON.parse(req.body.file);
+            if (!file) {
+                res.status(200).json(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
+            } else {
+                console.log("등록 예정 이벤트 수 : " + (file.length-1));
+                for (let i = 1; i < file.length; i++) {
+                    let original_price = Number(file[i].original_price);
+                    let count = Number(file[i].count);
+                    let update_product = 
+                        await Product.updateOne({ barcode : file[i].barcode , detail_name : file[i].detail_name }, { $set: { original_price : original_price , count : count } });
+        
+                    console.log(update_product);
+                }
+                res.status(200).json(utils.successTrue(statusCode.OK, resMessage.SAVE_SUCCESS));
+            }
+
+        } catch (err) {
+            console.log(err.message);
+            res.status(200).json(utils.successFalse(statusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR));
+        }
+    }
+})
 module.exports = router;

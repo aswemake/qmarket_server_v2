@@ -1,5 +1,5 @@
 var express = require('express');
-var router = express.Router();
+var router = express.Router({ mergeParams: true });
 
 const utils = require('../../../../module/response/utils');
 const resMessage = require('../../../../module/response/responseMessage');
@@ -15,7 +15,9 @@ router.get('/', async (req, res) => {
         res.redirect('../../start');
     } else {
         try {
-            let data = { partner_idx: req.params };
+            const { partner_idx } = req.params;
+            let data = { partner_idx : partner_idx};
+            console.log("enroll : " + data.partner_idx)
             res.render('manager/enroll', { data });
         } catch (err) {
             console.log(err);
@@ -65,6 +67,7 @@ router.post('/', async (req, res) => {
             count: count,
             like_count: 0,
             shared_count: 0,
+            saled_count: 0,
             one_hundred_deal_event: false,
             is_adult: false,
             enabled: true,

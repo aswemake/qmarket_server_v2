@@ -46,7 +46,8 @@
         <input 
             style="background-color: #E7713F; color: white; border:none; padding:20px;  font-size: larger;" 
             type="button" 
-            value="할인상품 등록"/>
+            value="할인상품 등록"
+            onclick="move_enroll('/manager/<%= data.partner_idx %>/enroll_event', this)"/>
     </div>
     <article>
         <iframe id="content" src="/manager/<%= data.partner_idx %>/enroll"></iframe>

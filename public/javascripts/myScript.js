@@ -9,13 +9,13 @@ async function addPhoto() {
         "accessKeyId": "AKIAW55266QUGCJAGPYK",
         "secretAccessKey": "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",
         "region": "ap-northeast-2"
-    }) 
+    })
     var files = document.getElementById("image_main").files;
     if (!files.length) {
         return alert("이미지를 업로드해 주세요.");
     }
     var is_success = false;
-    for(var i = 0; i < files.length; i++) {
+    for (var i = 0; i < files.length; i++) {
         var file = files[i];
         var fileName = file.name;
         // Use S3 ManagedUpload class as it supports multipart uploads
@@ -29,11 +29,11 @@ async function addPhoto() {
         });
         var promise = upload.promise();
         await promise.then(
-            function(data) {
+            function (data) {
                 console.log(data);
                 is_success = true;
             },
-            function(err) {
+            function (err) {
                 console.log(err);
                 is_success = false;
             }
@@ -44,7 +44,7 @@ async function addPhoto() {
         return alert("이미지를 업로드해 주세요.");
     }
     var is_success = false;
-    for(var i = 0; i < files.length; i++) {
+    for (var i = 0; i < files.length; i++) {
         var file = files[i];
         var fileName = file.name;
         // Use S3 ManagedUpload class as it supports multipart uploads
@@ -58,17 +58,17 @@ async function addPhoto() {
         });
         var promise = upload.promise();
         await promise.then(
-            function(data) {
+            function (data) {
                 console.log(data);
                 is_success = true;
             },
-            function(err) {
+            function (err) {
                 console.log(err);
                 is_success = false;
             }
         );
     }
-    if(is_success) {
+    if (is_success) {
         alert("성공!");
     } else {
         alert("사진을 업로드 하던 도중 문제가 발생했습니다.\n");
@@ -78,7 +78,7 @@ async function addPhoto() {
 //영수증 폼
 function receipt(i) {
     var data = JSON.parse(i);
-    var order_time = new Date(data.order_date).toISOString().substring(0,19).replace('T',' / ');
+    var order_time = new Date(data.order_date).toISOString().substring(0, 19).replace('T', ' / ');
     var objWin = window.open('', 'print');
     objWin.document.write("<!doctype html>");
     objWin.document.write("<html>");
@@ -113,41 +113,41 @@ function receipt(i) {
     objWin.document.write("<body>");
     objWin.document.write("<div>");
     objWin.document.write("<div class = 'paper'>");
-    objWin.document.write("<div class = 'title'>영수증</div>"); 
+    objWin.document.write("<div class = 'title'>영수증</div>");
     objWin.document.write("<div>----------------------------------------------</div>");
     //----------------------주문정보--------------------------
     objWin.document.write("<div>주문ID   : ");
-    if(data.order_id != null){
+    if (data.order_id != null) {
         objWin.document.write(data.order_id);
     }
     objWin.document.write("</div>");
     objWin.document.write("<div>주문시간 : ");
-    if(order_time != null){
+    if (order_time != null) {
         objWin.document.write(order_time);
     }
     objWin.document.write("</div>");
     objWin.document.write("<div>수령인   : ");
-    if(data.receiver != null){
+    if (data.receiver != null) {
         objWin.document.write(data.receiver);
     }
     objWin.document.write("</div>");
     objWin.document.write("<div>주소     : ");
-    if(data.address != null){
+    if (data.address != null) {
         objWin.document.write(data.address);
     }
     objWin.document.write("</div>");
     objWin.document.write("<div>공동현관 : ");
-    if(data.home_pwd != null){
+    if (data.home_pwd != null) {
         objWin.document.write(data.home_pwd);
     }
     objWin.document.write("</div>");
     objWin.document.write("<div>배송메모 : ");
-    if(data.delivery_memo != null){
+    if (data.delivery_memo != null) {
         objWin.document.write(data.delivery_memo);
     }
     objWin.document.write("</div>");
     objWin.document.write("<div>주문자 연락처 : ");
-    if(data.phone != null){
+    if (data.phone != null) {
         objWin.document.write(data.phone);
     }
     objWin.document.write("</div>");
@@ -160,15 +160,15 @@ function receipt(i) {
     objWin.document.write("</div>");
     objWin.document.write("<div>----------------------------------------------</div>");
     //---------------------품목, 수량 및 가격----------------------------
-    for(var j = 0; j < data.products.length; j++){
+    for (var j = 0; j < data.products.length; j++) {
         objWin.document.write("<div class = 'clearfixed'>");
-        objWin.document.write("<div>" + (j+1) + ". " + data.products[j].name + "</div>");
+        objWin.document.write("<div>" + (j + 1) + ". " + data.products[j].name + "</div>");
         objWin.document.write("<div class = 'pro_count_price'>");
         objWin.document.write("<div class = 'pro_price'>" + number_WithCommas(data.products[j].original_price) + "</div>");
         objWin.document.write("<div class = 'pro_count'>" + number_WithCommas(data.products[j].count) + "</div>");
         objWin.document.write("</div>");
         objWin.document.write("</div>");
-        if(data.products[j].original_price - data.products[j].saled_price > 0){
+        if (data.products[j].original_price - data.products[j].saled_price > 0) {
             objWin.document.write("<div class = 'clearfixed'>");
             objWin.document.write("<div class = 'pro_sale_title'>ㄴ할인</div>");
             objWin.document.write("<div class = 'pro_sale'>" + minus_number_WithCommas(data.products[j].original_price - data.products[j].saled_price) + "</div>");
@@ -180,22 +180,22 @@ function receipt(i) {
     objWin.document.write("<div class = 'clearfixed'>");
     objWin.document.write("<div class = 'total_title'>합  계</div>");
     objWin.document.write("<div class = 'total_center'>:</div>");
-    objWin.document.write("<div class = 'total_price'>"+ number_WithCommas(data.total_original_price) +"</div>");
+    objWin.document.write("<div class = 'total_price'>" + number_WithCommas(data.total_original_price) + "</div>");
     objWin.document.write("</div>");
     objWin.document.write("<div class = 'clearfixed'>");
     objWin.document.write("<div class = 'total_title'>할인금액</div>");
     objWin.document.write("<div class = 'total_center'>:</div>");
-    objWin.document.write("<div class = 'total_price'>"+ minus_number_WithCommas(data.total_original_price - data.total_saled_price) +"</div>");
+    objWin.document.write("<div class = 'total_price'>" + minus_number_WithCommas(data.total_original_price - data.total_saled_price) + "</div>");
     objWin.document.write("</div>");
     objWin.document.write("<div class = 'clearfixed'>");
     objWin.document.write("<div class = 'total_title'>포 인 트</div>");
     objWin.document.write("<div class = 'total_center'>:</div>");
-    objWin.document.write("<div class = 'total_price'>"+ minus_number_WithCommas(data.qmoney) +"</div>");
+    objWin.document.write("<div class = 'total_price'>" + minus_number_WithCommas(data.qmoney) + "</div>");
     objWin.document.write("</div>");
     objWin.document.write("<div class = 'clearfixed'>");
     objWin.document.write("<div class = 'total_title'>배 송 비</div>");
     objWin.document.write("<div class = 'total_center'>:</div>");
-    objWin.document.write("<div class = 'total_price'>"+ plus_number_WithCommas(data.delivery_price) +"</div>");
+    objWin.document.write("<div class = 'total_price'>" + plus_number_WithCommas(data.delivery_price) + "</div>");
     objWin.document.write("</div>");
     objWin.document.write("<div class = 'clearfixed'>");
     objWin.document.write("<div class = 'last_title'> 결제금액</div>");
@@ -226,54 +226,54 @@ function number_WithCommas(number) {
     return number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 }
 function minus_number_WithCommas(number) {
-    if(number == 0){
+    if (number == 0) {
         return "0"
     }
-    else{
+    else {
         return "-" + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 }
 function plus_number_WithCommas(number) {
-    if(number == 0){
+    if (number == 0) {
         return "0"
     }
-    else{
+    else {
         return "+" + number.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 }
 
 //중단 카테고리 로드 function
-function child_category_change(category1){
+function child_category_change(category1) {
     let category_1 = [
-                      ["전체"],
-                      
-                      ["정육/계란", "두부/콩나물", "채소", "과일", "쌀/잡곡", "수산/건어", "유제품/냉장", "생수/음료", "커피/차"],
-                      
-                      ["간편식/반찬", "과자/디저트/견과류", "라면/양념/장"],
-                      
-                      ["생활/주방", "위생/뷰티", "여성/유아"],
+        ["전체"],
 
-                      ["기타"],
+        ["정육/계란", "두부/콩나물", "채소", "과일", "쌀/잡곡", "수산/건어", "유제품/냉장", "생수/음료", "커피/차"],
 
-                      ["밀키트", "마카롱/디저트", "커피/원두", "꽃/화분", "식기/주방세트", "와인키트", "에코백/업사이클", 
-                        "비누/천연제품", "카메라", "전통주키트", "브런치/샐러드", "혼밥키트", "ProHealther", "Salon 21", "24 SEASON"]
-                     ];
+        ["간편식/반찬", "과자/디저트/견과류", "라면/양념/장"],
+
+        ["생활/주방", "위생/뷰티", "여성/유아"],
+
+        ["기타"],
+
+        ["밀키트", "마카롱/디저트", "커피/원두", "꽃/화분", "식기/주방세트", "와인키트", "에코백/업사이클",
+            "비누/천연제품", "카메라", "전통주키트", "브런치/샐러드", "혼밥키트", "ProHealther", "Salon 21", "24 SEASON"]
+    ];
 
     let category_2 = [
-                      ["전체"],
-                      
-                      ["돼지고기", "소고기", "닭/오리고기", "계란/메추리알", "기타정육", "가공정육/특수부위"],
+        ["전체"],
 
-                      ["즉석밥/죽/누룽지", "반찬/김", "김치/단무지", "카레/짜장/스프", 
-                       "국/탕/찌개", "만두/피자/냉동", "떡/떡볶이/떡국", "통조림/간편조리"],
+        ["돼지고기", "소고기", "닭/오리고기", "계란/메추리알", "기타정육", "가공정육/특수부위"],
 
-                      ["화장지/물티슈/일회용품", "주방/생활용품", "세안/욕실용품", "청소/세탁용품", 
-                       "생활가전/충전기", "건전지/공구/형광등", "잡화/장난감", "문구/학용품", "성인용품"],
+        ["즉석밥/죽/누룽지", "반찬/김", "김치/단무지", "카레/짜장/스프",
+            "국/탕/찌개", "만두/피자/냉동", "떡/떡볶이/떡국", "통조림/간편조리"],
 
-                      ["기타"],
+        ["화장지/물티슈/일회용품", "주방/생활용품", "세안/욕실용품", "청소/세탁용품",
+            "생활가전/충전기", "건전지/공구/형광등", "잡화/장난감", "문구/학용품", "성인용품"],
 
-                      ["전체"]
-                     ];                
+        ["기타"],
+
+        ["전체"]
+    ];
     var selected_value = category1.options[category1.selectedIndex].value;
     var parent_idx = parseInt(selected_value);
 
@@ -291,7 +291,7 @@ function child_category_change(category1){
         opt.innerHTML = child_category[category_num];
         target1.appendChild(opt);
     }
-    
+
     var target2 = document.getElementById("grand_child_category");
     var grand_child_category;
 
@@ -308,45 +308,45 @@ function child_category_change(category1){
     }
 }
 //최하위 카테고리 로드 function
-function grand_child_category_change(category2){
+function grand_child_category_change(category2) {
     let category = [
-                    [["전체"]],
+        [["전체"]],
 
-                    [["돼지고기", "소고기", "닭/오리고기", "계란/메추리알", "기타정육", "가공정육/특수부위"],
-                     ["두부/묵", "콩나물/숙주"],
-                     ["양파/파/마늘/생강", "시금치/나물/부추/미나리", "고추/쌈채소", "버섯", "감자/고구마/마/더덕/도라지", "배추/무/김장채소", 
-                      "오이/호박/가지/옥수수", "양상추/양배추/샐러드", "당근/우엉/연근", "파프리카/브로콜리/피망", "기타채소"],
-                     ["사과/배/감", "딸기/바나나/복숭아/자두", "참외/감귤/오렌지/수박", "토마토/포도/기타", "키위/메론/수입과일", "냉동/간편과일"],
-                     ["쌀/찹쌀", "현미/보리", "콩/잡곡"],
-                     ["고등어/갈치/삼치", "연어/명태/대구/기타생선", "회/초밥", "새우/해물", "어묵/맛살", "미역/다시마/해조류", "건어물"], 
-                     ["우유/두유", "요거트/요구르트", "치즈/버터/마가린", "햄/소시지/베이컨", "기타유제품"], 
-                     ["생수", "주스", "탄산수/탄산음료", "건강/이온", "어린이음료"], 
-                     ["커피/티", "커피믹스/원두/코코아", "보리차/녹차/전통차", "분말/파우더/에이드", "원액/청/꿀", "캡슐커피/커피용품"]],
+        [["돼지고기", "소고기", "닭/오리고기", "계란/메추리알", "기타정육", "가공정육/특수부위"],
+        ["두부/묵", "콩나물/숙주"],
+        ["양파/파/마늘/생강", "시금치/나물/부추/미나리", "고추/쌈채소", "버섯", "감자/고구마/마/더덕/도라지", "배추/무/김장채소",
+            "오이/호박/가지/옥수수", "양상추/양배추/샐러드", "당근/우엉/연근", "파프리카/브로콜리/피망", "기타채소"],
+        ["사과/배/감", "딸기/바나나/복숭아/자두", "참외/감귤/오렌지/수박", "토마토/포도/기타", "키위/메론/수입과일", "냉동/간편과일"],
+        ["쌀/찹쌀", "현미/보리", "콩/잡곡"],
+        ["고등어/갈치/삼치", "연어/명태/대구/기타생선", "회/초밥", "새우/해물", "어묵/맛살", "미역/다시마/해조류", "건어물"],
+        ["우유/두유", "요거트/요구르트", "치즈/버터/마가린", "햄/소시지/베이컨", "기타유제품"],
+        ["생수", "주스", "탄산수/탄산음료", "건강/이온", "어린이음료"],
+        ["커피/티", "커피믹스/원두/코코아", "보리차/녹차/전통차", "분말/파우더/에이드", "원액/청/꿀", "캡슐커피/커피용품"]],
 
-                    [["즉석밥/죽/누룽지", "반찬/김", "김치/단무지", "카레/짜장/스프", 
-                      "국/탕/찌개", "만두/피자/냉동", "떡/떡볶이/떡국", "통조림/간편조리"], 
-                     ["스낵/쿠키", "초콜릿/씨리얼", "사탕/껌/젤리", "아이스크림/얼음", "빵/샌드위치/잼", "디저트/푸딩", "견과류/건과"], 
-                     ["라면", "기타 면류", "장류/소스류", "조미료/향신료", "참기름/식용유", "밀가루/부침/튀김가루"]],
+        [["즉석밥/죽/누룽지", "반찬/김", "김치/단무지", "카레/짜장/스프",
+            "국/탕/찌개", "만두/피자/냉동", "떡/떡볶이/떡국", "통조림/간편조리"],
+        ["스낵/쿠키", "초콜릿/씨리얼", "사탕/껌/젤리", "아이스크림/얼음", "빵/샌드위치/잼", "디저트/푸딩", "견과류/건과"],
+        ["라면", "기타 면류", "장류/소스류", "조미료/향신료", "참기름/식용유", "밀가루/부침/튀김가루"]],
 
-                    [["화장지/물티슈/일회용품", "주방/생활용품", "세안/욕실용품", "청소/세탁용품", 
-                      "생활가전/충전기", "건전지/공구/형광등", "잡화/장난감", "문구/학용품", "성인용품"], 
-                     ["헤어/바디용품", "화장품/뷰티", "방향제/탈취제/방충제/제습제", "마스크/의약외품/소독제",
-                      "속옷/양말/스타킹", "건강기능식품", "반려동물용품"], 
-                     ["생리대/기저귀", "유아식/유아용품"]],
+        [["화장지/물티슈/일회용품", "주방/생활용품", "세안/욕실용품", "청소/세탁용품",
+            "생활가전/충전기", "건전지/공구/형광등", "잡화/장난감", "문구/학용품", "성인용품"],
+        ["헤어/바디용품", "화장품/뷰티", "방향제/탈취제/방충제/제습제", "마스크/의약외품/소독제",
+            "속옷/양말/스타킹", "건강기능식품", "반려동물용품"],
+        ["생리대/기저귀", "유아식/유아용품"]],
 
-                    [["기타"]],
+        [["기타"]],
 
-                    [["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"],
-                     ["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"]]
-                   ];
-    
+        [["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"],
+        ["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"], ["전체"]]
+    ];
+
     var selected_text = category2.options[category2.selectedIndex].text;
     var selected_value = category2.options[category2.selectedIndex].value;
-    var selected_parent_value = parseInt(parseInt(selected_value)/100);
-    var selected_child_value = parseInt(selected_value)%100;
+    var selected_parent_value = parseInt(parseInt(selected_value) / 100);
+    var selected_child_value = parseInt(selected_value) % 100;
 
     var target = document.getElementById("grand_child_category");
-    
+
     var grand_child_category = category[selected_parent_value][parseInt(selected_child_value)];
     console.log(grand_child_category);
 
@@ -357,11 +357,11 @@ function grand_child_category_change(category2){
         opt.value = category_num;
         opt.innerHTML = grand_child_category[category_num];
         target.appendChild(opt);
-    }	
+    }
 }
 
 //상품 검색
-function products_search(partner_id, obj){
+function products_search(partner_id, obj) {
 
     var URL = "/manager/" + partner_id + "/products/management?page=1";
     var keyword = document.getElementById("search");
@@ -372,15 +372,15 @@ function products_search(partner_id, obj){
     console.log(category1.options[category1.selectedIndex].text);
     console.log(category2.options[category2.selectedIndex].text);
     console.log(category3.options[category3.selectedIndex].text);
-    
-    if(keyword.value !== ""){
+
+    if (keyword.value !== "") {
         URL = URL + "&keyword=" + keyword.value;
     }
-    if(category1.options[category1.selectedIndex].text === "전체"){}
-    else if(category2.options[category2.selectedIndex].text === "전체"){
+    if (category1.options[category1.selectedIndex].text === "전체") { }
+    else if (category2.options[category2.selectedIndex].text === "전체") {
         URL = URL + "&category=" + category1.options[category1.selectedIndex].text;
     }
-    else if(category3.options[category3.selectedIndex].text === "전체"){
+    else if (category3.options[category3.selectedIndex].text === "전체") {
         URL = URL + "&category=" + category2.options[category2.selectedIndex].text;
     }
     else {
@@ -391,26 +391,26 @@ function products_search(partner_id, obj){
     document.getElementById('content').src = URL;
 }
 
-function products_move_page(partner_id, current_category, current_keyword, a_tag){
+function products_move_page(partner_id, current_category, current_keyword, a_tag) {
     var num = a_tag.text.replace(/(\s*)/g, "")
     var URL = "/manager/" + partner_id + "/products/management?page=" + num;
-    
+
     var keyword = current_keyword;
     var category = current_category;
     console.log("keyword : " + keyword)
     console.log("category : " + category)
 
-    if(keyword){
+    if (keyword) {
         URL = URL + "&keyword=" + keyword;
     }
-    if(category){
+    if (category) {
         URL = URL + "&category=" + category;
     }
     console.log(URL)
 
     var xhttp = new XMLHttpRequest()
-    xhttp.onreadystatechange = function() {
-        if(this.readyState == 4 && this.status == 200) {
+    xhttp.onreadystatechange = function () {
+        if (this.readyState == 4 && this.status == 200) {
             window.location.href = xhttp.responseURL;
         }
     }
@@ -418,8 +418,8 @@ function products_move_page(partner_id, current_category, current_keyword, a_tag
     xhttp.setRequestHeader("Content-Type", "application/json")
     xhttp.send();
 }
-//상품 등록 엑셀 파일 업로드 함수
 
+//상품 등록 엑셀 파일 업로드 함수
 function onfilechange(file, id) {
     console.log(file.files[0].name.split('.').pop());
     var file_val = file.files[0].name;
@@ -442,39 +442,123 @@ async function sendExcelFile(idx) {
         let url = "/manager/" + partner_idx + "/enroll_excel";
         reader.onload = function () {
             let data = reader.result;
+            let rows;
             let workBook = XLSX.read(data, { type: 'binary' });
-            workBook.SheetNames.forEach(function (sheetName) {
-                console.log('SheetName: ' + sheetName);
-                let rows = XLSX.utils.sheet_to_json(workBook.Sheets[sheetName]);
-                rows.forEach(object => {
-                    renameKey(object, '바코드', 'barcode');
-                    renameKey(object, '상품이름', 'detail_name');
-                    renameKey(object, '규격', 'standard');
-                    renameKey(object, '상품 브랜드 이름', 'name');
-                    renameKey(object, '상품 카테고리', 'category');
-                    renameKey(object, '상품 원가', 'price');
-                    renameKey(object, '상품 할인율', 'sale_ratio');
-                    renameKey(object, '상품 재고', 'count');
-                    renameKey(object, '해시태그1', 'hashtag1');
-                    renameKey(object, '해시태그2', 'hashtag2');
-                    renameKey(object, '해시태그3', 'hashtag3');
-                    renameKey(object, '메인 이미지', 'main_img');
-                    renameKey(object, '상세 이미지', 'detail_img');
-
-                })
-                if (confirm("상품을 등록하시겠습니까?")) {
-                    var xhttp = new XMLHttpRequest()
-                    xhttp.onreadystatechange = function () {
-                        if (this.readyState == 4 && this.status == 200) {
-                            alert('상품이 성공적으로 등록되었습니다.')
-                        }
-                    }
-                    xhttp.open("POST", url, true)
-                    xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-                    xhttp.send("file=" + JSON.stringify(rows));
-                    //window.location.reload()
-                }
+            rows = XLSX.utils.sheet_to_json(workBook.Sheets[workBook.SheetNames[0]]);
+            rows.forEach(object => {
+                renameKey(object, '바코드', 'barcode');
+                renameKey(object, '상품명', 'detail_name');
+                renameKey(object, '브랜드명', 'name');
+                renameKey(object, '규격', 'standard');
+                renameKey(object, '가격', 'original_price');
+                renameKey(object, '재고', 'count');
+                renameKey(object, '해시태그1', 'hashtag1');
+                renameKey(object, '해시태그2', 'hashtag2');
+                renameKey(object, '해시태그3', 'hashtag3');
+                renameKey(object, '상품 카테고리', 'category');
+                renameKey(object, '메인 이미지명', 'main_img');
+                renameKey(object, '상세 이미지명', 'detail_img');
             })
+            var returnValue = window.confirm("상품을 등록하시겠습니까?")
+            if (returnValue) {
+                var xhttp = new XMLHttpRequest()
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        alert('상품이 성공적으로 등록되었습니다.')
+                        window.location.reload()
+                    }
+                }
+                xhttp.open("POST", url, true)
+                xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+                xhttp.send("file=" + JSON.stringify(rows));
+            } else {
+                alert('상품 삭제가 취소되었습니다.');
+                window.location.reload();
+            }
+        };
+        reader.readAsBinaryString(input.files[0]);
+    } catch (error) {
+        alert(error);
+    }
+}
+
+async function sendExcelFile_event(idx) {
+    try {
+        let input = document.getElementById('product_excel');
+        let reader = new FileReader();
+        let partner_idx = idx;
+        let url = "/manager/" + partner_idx + "/enroll_event";
+        reader.onload = function () {
+            let data = reader.result;
+            let rows;
+            let workBook = XLSX.read(data, { type: 'binary' , cellDates:true });
+            rows = XLSX.utils.sheet_to_json(workBook.Sheets[workBook.SheetNames[0]]);
+            rows.forEach(object => {
+                renameKey(object, '바코드', 'barcode');
+                renameKey(object, '상품명', 'detail_name');
+                renameKey(object, '이벤트명', 'name');
+                renameKey(object, '특매가', 'sale_price');
+                renameKey(object, '시작날짜', 'start_date');
+                renameKey(object, '끝날짜', 'end_date');
+            })
+            var returnValue = window.confirm("이벤트 등록하시겠습니까?")
+            if (returnValue) {
+                var xhttp = new XMLHttpRequest()
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        alert('이벤트가 성공적으로 등록되었습니다.')
+                        window.location.reload()
+                    }
+                }
+                xhttp.open("POST", url, true)
+                xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+                xhttp.send("file=" + JSON.stringify(rows));
+            } else {
+                alert('이벤트 등록이 취소되었습니다.');
+                window.location.reload();
+            }
+        };
+        reader.readAsBinaryString(input.files[0]);
+    } catch (error) {
+        alert(error);
+    }
+}
+
+async function sendExcelFile_batch_product(idx) {
+    try {
+        let input = document.getElementById('product_excel');
+        let reader = new FileReader();
+        let url = "/manager/products/change/batch_management";
+        console.log(url)
+        reader.onload = function () {
+            let data = reader.result;
+            let rows;
+            let workBook = XLSX.read(data, { type: 'binary' });
+            console.log(workBook)
+            rows = XLSX.utils.sheet_to_json(workBook.Sheets[workBook.SheetNames[0]]);
+            console.log(rows)
+            rows.forEach(object => {
+                renameKey(object, '바코드', 'barcode');
+                renameKey(object, '상품명', 'detail_name');
+                renameKey(object, '가격', 'original_price');
+                renameKey(object, '재고', 'count');
+            })
+            var returnValue = window.confirm("수정하시겠습니까?")
+            if (returnValue) {
+                var xhttp = new XMLHttpRequest()
+                xhttp.onreadystatechange = function () {
+                    if (this.readyState == 4 && this.status == 200) {
+                        alert('수정이 성공적으로 완료되었습니다.')
+                        window.location.reload()
+                    }
+                }
+                xhttp.open("PUT", url, true)
+                xhttp.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+                xhttp.send("file=" + JSON.stringify(rows));
+            } else {
+                alert('수정이 취소되었습니다.');
+                window.location.reload();
+            }
         };
         reader.readAsBinaryString(input.files[0]);
     } catch (error) {
