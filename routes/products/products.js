@@ -44,15 +44,18 @@ router.get('/', async (req, res) => {
                         }
                         
                         // 기본 할인 상품 (상생지원금 3.3%만큼 할인)
+                        const default_sale_ratio = 0.033;
                         if (products[i].events.length < 1 || saled_price == 0) { // 이벤트가 없거나 현재 진행중인 이벤트가 없을 경우
-                            const default_sale_ratio = 0.033;
                             price = Math.floor(price * (1 - default_sale_ratio));
                             price = price - (price % 10);
                             saled_price = price;
                         }
                         // 이벤트 할인 상품
                         else {
-                            sale_ratio = Math.floor(((price - saled_price) / price) * 100);
+                            sale_ratio = ((price - saled_price) / price) + default_sale_ratio;
+                            saled_price = Math.floor(price * (1 - sale_ratio));
+                            saled_price = saled_price - (saled_price % 10);
+                            sale_ratio = Math.floor(sale_ratio * 100);
                         }
                     }
 
@@ -218,15 +221,18 @@ router.get('/:product_idx', async (req, res) => {
                     }
 
                     // 기본 할인 상품 (상생지원금 3.3%만큼 할인)
+                    const default_sale_ratio = 0.033;
                     if (product[0].events.length < 1 || saled_price == 0) { // 이벤트가 없거나 현재 진행중인 이벤트가 없을 경우
-                        const default_sale_ratio = 0.033;
                         price = Math.floor(price * (1 - default_sale_ratio));
                         price = price - (price % 10);
                         saled_price = price;
                     }
                     // 이벤트 할인 상품
                     else {
-                        sale_ratio = Math.floor(((price - saled_price) / price) * 100);
+                        sale_ratio = ((price - saled_price) / price) + default_sale_ratio; //0.433
+                        saled_price = Math.floor(price * (1 - sale_ratio));
+                        saled_price = saled_price - (saled_price % 10);
+                        sale_ratio = Math.floor(sale_ratio * 100);
                     }
                 }
 
