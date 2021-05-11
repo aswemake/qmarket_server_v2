@@ -33,52 +33,36 @@ router.get('/', async (req, res) => {
             // 마트, h_code 별 배송비 정보 출력
             let partner = await Partner.aggregate([
                 { $match: { _id: mongoose.Types.ObjectId(partner_idx) } },
-                { $unwind: '$delivery_charge' },
-                { $project: { _id: 1, delivery_charge: 1 } },
-                { $match: { 'delivery_charge.h_code': { $in: [h_code] } } },
+                { $unwind: '$delivery.charge' },
+                { $project: { _id: 1, delivery: 1 } },
+                { $match: { 'delivery.charge.h_code': { $in: [h_code] } } }
             ]);
             if (partner.length <= 0) throw new Error("incorrect partner_idx or h_code");
             
             // 정보 저장
-            const minimum_order_price = partner[0].delivery_charge.minimum_order_price;
-            const free_delivery_price = partner[0].delivery_charge.free_delivery_price
-            // let delivery_charge_range = [];
-            // for (let i = 0; i < partner[0].delivery_charge.range.length - 1; i++) {
-            //     let delivery_charge_range_info = {
-            //         start_price: partner[0].delivery_charge.range[i].start_price,
-            //         end_price: partner[0].delivery_charge.range[i].end_price + 1,
-            //         delivery_price: (partner[0].delivery_charge.range[i].delivery_price) ? partner[0].delivery_charge.range[i].delivery_price : '무료'
-            //     }
-            //     delivery_charge_range.push(delivery_charge_range_info);
-            // }
-
-            let delivery_charge_text = "";
-            for (let i = 0; i < partner[0].delivery_charge.range.length; i++) {
-                let start_price_text = `${partner[0].delivery_charge.range[i].start_price}원 이상`;
-                let end_price_plue_one_text = (partner[0].delivery_charge.range[i].end_price) ? `${partner[0].delivery_charge.range[i].end_price + 1}원 미만` : '';
-                let delivery_price = (partner[0].delivery_charge.range[i].delivery_price) ? partner[0].delivery_charge.range[i].delivery_price : '무료';
-                let text = `${start_price_text} ${end_price_plue_one_text} -- [${delivery_price}]\n`;
-                delivery_charge_text += text;
-            }
-
+            const minimum_order_price = partner[0].delivery.charge.minimum_order_price;
+            const free_delivery_price = partner[0].delivery.charge.free_delivery_price;
+            const delivery_charge_when_under_minimum_order_price = partner[0].delivery.charge.delivery_charge;
+            
+            // 상품 상세 정보 배송비 안내
+            let delivery_charge_text = `최소 주문금액: ${minimum_order_price}원\n배송비: ${free_delivery_price}원\n무료 배송: ${delivery_charge}원 이상\n(*배송지역마다 배송비가 상이합니다.)`;
             
             // total_price 입력되었을 경우 data.delivery_charge에 배송비 결과 출력
             if (total_price) {
-                for (let i = 0; i < partner[0].delivery_charge.range.length; i++) {
-                    let start_price = partner[0].delivery_charge.range[i].start_price;
-                    let end_price_plue_one = (partner[0].delivery_charge.range[i].end_price) ? partner[0].delivery_charge.range[i].end_price + 1 : 999999999;
-                    let delivery_price = partner[0].delivery_charge.range[i].delivery_price;
-                    if (start_price <= total_price && total_price < end_price_plue_one) {
-                        delivery_charge = delivery_price;
-                        break;
-                    }
-                }
+                // 1. total_price가 minimum_order_price 보다 작으면 배송불가 (data.delivery_charge = -1 유지)
+
+                // 2. total_price가 minimum_order_price 보다 크거나 같고 free_delivery_price 보다 작으면 devliery_charge로 update
+                if (total_price >= minimum_order_price && total_price < free_delivery_price)
+                    delivery_charge = delivery_charge_when_under_minimum_order_price;
+
+                // 3. total_price가 free_delivery_price보다 크면 무료 배송
+                if (total_price >= free_delivery_price) 
+                    delivery_charge = 0;
             }
             
             data = {
                 minimum_order_price: minimum_order_price,
                 free_delivery_price: free_delivery_price,
-                // delivery_charge_range: delivery_charge_range,
                 delivery_charge_text: delivery_charge_text, // text 내용 디자인에 맞춰서 수정해야됨
                 delivery_charge: delivery_charge
             };
