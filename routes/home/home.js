@@ -21,7 +21,7 @@ router.get('/', async (req, res) => {
             let banners = [];
             const event_products_count = 20; // 추천 상품 리스트 갯수
             const one_hundred_deal_event_products_count = 10; // 100원딜 상품 리스트 갯수
-            const latest_products_count = 4; // 최신 상품 리스트 갯수
+            const latest_products_count = 4; // 최신 상품 리스트 갯수 -> 수정 예정
             const start_index = 0; // 상품 검색 시작 인덱스
 
             // response 출력 형식 함수

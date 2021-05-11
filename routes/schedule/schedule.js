@@ -9,103 +9,34 @@ var serviceAccount = require('../../qmarket-47a89-firebase-adminsdk-8md13-d56a94
 
 const pool = require('../../config/dbConfig');
 
+let Product = require('../../schemas/product_v2');
 let Coupon = require('../../schemas/coupon');
 let Coupon_user = require('../../schemas/coupon_user');
-let Enroll_Party = require('../../schemas/enroll_party');
-let Party = require('../../schemas/party');
-let Notification = require('../../schemas/notification');
 
-
-// 매15분마다 실행
-let notification = schedule.scheduleJob("*/15 * * * *", async () => {
-    // 현재시간 구하기
-    let current_time = new Date(Date.now() + (3600000 * 9));
-    // 현재시간에서 3시간 5분 전 시간구하기
-    let momentDate = moment(Date.now()).subtract(3, "hours");
-    console.log(`momentDate: ${momentDate}`);
-    let start_time = momentDate.subtract(5, "minutes").format("YYYY-MM-DD HH:mm");
-    console.log(`start_time: ${start_time}`);
-
-    // 현재시간에서 3시간 5분 후 시간구하기
-    let momentDate2 = moment(Date.now()).subtract(3, "hours");
-    console.log(`momentDate2: ${momentDate2}`);
-    let end_time = momentDate2.add(5, "minutes").format("YYYY-MM-DD HH:mm");
-    console.log(`end_time: ${end_time}`);
-
+// 1시간마다 실행
+let check_one_hour = schedule.scheduleJob("0 0 */1 * * *", async () => { // 1시간 단위
     try {
-        var connection = await pool.getConnection();
-        let query = 'SELECT fcm_token, user_idx FROM users WHERE user_idx = ?';
-        let find_party = await Party.find({ start_time: { $elemMatch: { $gte: start_time, $lte: end_time } } }).select({ name: 1, episode: 1 });
-        console.log(find_party);
-        if (!find_party[0]) {
-            console.log("해당하는 반상회가 없습니다.");
-        } else {
-            // 해당하는 반상회 수 만큼 반복
-            for (let i = 0; i < find_party.length; i++) {
-                // 반상회 멤버들의 토큰을 담는 배열 생성
-                let party_member = [];
-                let users = [];
-                // 반상회 멤버 찾기
-                let find_member = await Enroll_Party.find({ party_idx: find_party[i]._id });
-                for (let j = 0; j < find_member.length; j++) {
-                    if (find_member[j].enroll[find_party[i].episode] == 1 || find_member[j].is_All == true) {
-                        // 반상회 멤버 fcm_token찾기
-                        let find_token = await connection.query(query, [find_member[j].user_idx]);
-                        party_member.push(find_token[0].fcm_token);
-                        users.push(find_token[0].user_idx);
+        let current_date = new Date(Date.now() + (3600000 * 9));
+        console.log(current_date);
+
+        // 상품 이벤트 종료
+        let delete_product_event = await Product.updateMany( 
+            {},
+            { 
+                $pull: {
+                    events: {
+                        end_date: { $lte: current_date }
                     }
                 }
-                console.log(users);
-                if (!admin.apps.length) {
-                    admin.initializeApp({
-                        credential: admin.credential.cert(serviceAccount),
-                    });
-                }
-                let message = {
-                    notification: {
-                        title: find_party[i].name,
-                        body: '반상회 시작 3시간 전입니다.'
-                    },
-                    data: {
-                        party_idx: JSON.stringify(find_party[i]._id)
-                    },
-                    tokens: party_member,
-                }
-
-                // 해당 구문 실행시 디바이스로 메세지 전송
-                admin.messaging().sendMulticast(message)
-                    .then(response => {
-                        console.log("응답")
-                        console.log(response)
-                    })
-                    .catch(error => {
-                        console.log("오류")
-                        console.log(error)
-                    })
-
-                // 큐알림 데이터베이스에 저장
-                for (let k = 0; k < users.length; k++) {
-                    let notification_save = new Notification({
-                        user_idx: users[k],
-                        type: '반상회',
-                        link: {
-                            link_type: 'party_idx',
-                            link_address: find_party[i]._id
-                        },
-                        name: message.notification.body,
-                        content: message.notification.title,
-                        created_at: current_time
-                    })
-                    let notification_save_result = await notification_save.save();
-                }
             }
-        }
+        );
+
+        console.log(delete_product_event);
     } catch (err) {
         console.log(err);
-    } finally {
-        connection.release();
     }
 })
+
 
 // 매일 오전 12시 1분에 실행
 let check = schedule.scheduleJob("1 0 * * *", async () => {
