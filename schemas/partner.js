@@ -67,11 +67,6 @@ const partnerSchema = new Schema({
     delivery: {
         type: Object,
         required: true
-    },
-    // 배달비
-    delivery_charge: {
-        type: [Object],
-        required: true
     }
 });
 
