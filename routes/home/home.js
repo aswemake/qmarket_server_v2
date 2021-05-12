@@ -19,9 +19,9 @@ router.get('/', async (req, res) => {
         try {
             let data = new Object();
             let banners = [];
-            const event_products_count = 20; // 추천 상품 리스트 갯수
+            // const event_products_count = 20; // 전단 행사 상품 리스트 갯수
             const one_hundred_deal_event_products_count = 10; // 100원딜 상품 리스트 갯수
-            const latest_products_count = 4; // 최신 상품 리스트 갯수 -> 수정 예정
+            const latest_products_count = 100; // 최신 상품 리스트 갯수
             const start_index = 0; // 상품 검색 시작 인덱스
 
             // response 출력 형식 함수
@@ -119,8 +119,8 @@ router.get('/', async (req, res) => {
                                                                             }
                                                                         }
                                                                     }
-                                                                },
-                                                                { $sample: { size: event_products_count } } ]);
+                                                                }
+                                                            ]);
                 event_products = await set_response_format(event_products);
 
                 // [100원딜 찬스] -> 100원딜 이벤트 상품 one_hundred_deal_event_products_count개 출력
