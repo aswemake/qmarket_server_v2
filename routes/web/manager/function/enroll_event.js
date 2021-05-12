@@ -48,17 +48,66 @@ router.post('/', async function (req, res) {
             } else {
                 let file = JSON.parse(req.body.file);
                 if (!file) {
-                    res.status(200).json(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
+                    res.status(201).json(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
                 } else {
-                    console.log("등록 예정 이벤트 수 : " + (file.length-1));
-                    for (let i = 1; i < file.length; i++) {
-                        let update_event = 
-                                await Product.updateOne({ partner_idx : partner_idx, barcode : file[i].barcode , detail_name : file[i].detail_name }, 
-                                    {$push : { events : { name : file[i].name, start_date : new Date(new Date(file[i].start_date).getTime() + (3600000 * 9) + 52000), end_date : new Date(new Date(file[i].end_date).getTime() + (3600000 * 9) + 52000), sale_ratio : file[i].sale_price }}});
-            
-                        console.log(update_event);
+                    console.log("등록 예정 이벤트 수 : " + (file.length-2));
+                    let all_clear = true;
+                    let not_finded_rows = [];
+                    let incorrect_rows = [];
+                    for (let i = 2; i < file.length; i++) {
+
+                        if(file[i].barcode == undefined || file[i].barcode == ""){
+                            all_clear = false;
+                            incorrect_rows.push(i+2);
+                            continue;
+                        }
+                        let find_product = await Product.find({ partner_idx : partner_idx, barcode : file[i].barcode, one_hundred_deal_event : false });
+                        
+                        if(find_product.length == 0){
+                            all_clear = false;
+                            not_finded_rows.push(i+2);
+                        } else {
+                            let type;
+                            if(file[i].type == '전단할인'){
+                                type = 200;
+                            } else if(file[i].type == '상시할인') {
+                                type = 300;
+                            } else if(file[i].type == '100원딜'){
+                                type = 100;
+                            }
+
+                            if(type == 200){
+                                if(file[i].start_date == "" || file[i].start_date == undefined || file[i].end_date == "" || file[i].end_date == undefined){
+                                    all_clear = false;
+                                    incorrect_rows.push(i+2);
+                                } else {
+                                    
+                                    let start_date = new Date(new Date(file[i].start_date).getTime() + (3600000 * 9) + 52000);
+                                    let end_date = new Date(new Date(file[i].end_date).getTime() + (3600000 * 33) + 52000);
+                                    let update_event = await Product.updateOne({ partner_idx : partner_idx, barcode : file[i].barcode , one_hundred_deal_event : false }, 
+                                        {$push : { events : { type : type, start_date : start_date, end_date : end_date, saled_price : file[i].sale_price }}});
+                                    console.log(update_event);   
+                                }
+                            } else if(type == 300){
+                                let start_date = new Date(new Date("2000-02-02T00:00:00.000Z").getTime() + (3600000 * 9) + 52000);
+                                let end_date =new Date(new Date("2222-02-02T00:00:00.000Z").getTime() + (3600000 * 33) + 52000);
+                                let update_event = await Product.updateOne({ partner_idx : partner_idx, barcode : file[i].barcode , one_hundred_deal_event : false }, 
+                                    {$push : { events : { type : type, start_date : start_date, end_date : end_date, saled_price : file[i].sale_price }}});
+                                console.log(update_event);
+                            } else {
+                                //100원딜 추후 처리
+                            }
+                        }
                     }
-                    res.status(200).json(utils.successTrue(statusCode.OK, resMessage.SAVE_SUCCESS));
+                    if(all_clear) {
+                        res.status(200).json(utils.successTrue(statusCode.OK, resMessage.SAVE_SUCCESS));
+                    } else {
+                        console.log("상품이 등록되지 않은 바코드 넘버 수 : " + not_finded_rows.length)
+                        console.log(not_finded_rows)
+                        console.log("입력이 올바르지 않은 행의 수 : " + incorrect_rows.length)
+                        console.log(incorrect_rows)
+                        res.status(202).json(utils.successTrue(statusCode.OK, resMessage.SAVE_SUCCESS));
+                    }
                 }
             }
         } catch (err) {

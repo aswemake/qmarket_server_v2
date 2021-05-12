@@ -40,16 +40,17 @@ router.get('/', async (req, res) => {
                     let total_original_price = 0;
                     let total_saled_price = 0;
                     for (let j = 0; j < order_products.length; j++) {
-                        let product_info = await Product.find({ _id: order_products[j].product_id }).select({ detail_name: 1, price: 1 });
+                        let product_info = await Product.find({ _id: order_products[j].product_id }).select({ detail_name: 1, original_price: 1, events:1 });
+                        console.log(product_info);
                         if (product_info.length < 1) throw new Error('incorrect product_idx');
                         let product = {
                             name: product_info[0].detail_name,
-                            original_price: product_info[0].price * order_products[j].count, // 상품 실제 가격 (원래가격 * 수량)
+                            original_price: (product_info[0].events.length == 0 ? product_info[0].original_price : product_info[0].events[product_info.events.length - 1].saled_price) * order_products[j].count, // 상품 실제 가격 (원래가격 * 수량)
                             saled_price: order_products[j].price, // 상품 결제 가격
                             count: order_products[j].count // 주문 수량
                         };
                         products.push(product);
-                        total_original_price += product_info[0].price * order_products[j].count;
+                        total_original_price += (product_info[0].events.length == 0 ? product_info[0].original_price : product_info[0].events[product_info.events.length - 1].saled_price) * order_products[j].count;
                         total_saled_price += order_products[j].price;
                     }
                     let order = {

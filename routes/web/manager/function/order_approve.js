@@ -18,6 +18,7 @@ router.put('/', async (req, res) => {
         console.log("쿠키가 만료되었거나 로그인이 필요합니다.");
         res.redirect('../../start');
     } else {
+        console.log('서버진입')
         const order_request_approval_status = 200;
         const { order_id } = req.body;
         if (!order_id) {
@@ -35,7 +36,7 @@ router.put('/', async (req, res) => {
                     /* orders table update */
 
                     let update_orders_query = 'UPDATE orders SET status = ? WHERE order_id = ?';
-                    let update_orders_result = await connection.query(update_orders_query, [order_request_approval_status, order_id]);
+                    let update_orders_result = await connection.query(update_orders_query, [order_request_approval_status, order_id[i]]);
                     if (update_orders_result.affectedRows !== 1) throw new Error('update orders table error');
 
             
@@ -50,7 +51,7 @@ router.put('/', async (req, res) => {
                                                     FROM orders_products
                                                     WHERE order_id = ?
                                                     GROUP BY order_id) AS g ON o.order_id = g.order_id) AS o ON u.user_idx = o.user_idx`
-                    let get_info_result = await connection.query(get_info_query, [order_id]);
+                    let get_info_result = await connection.query(get_info_query, [order_id[i]]);
                     if (get_info_result.length < 1) throw new Error('get user_idx, order_info, fcm_token error');
 
                     // 대표상품 detail_name 출력

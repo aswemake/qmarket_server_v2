@@ -68,42 +68,43 @@ router.get('/management', async (req, res) => {
         } else {
             try {
                 // 서버에 올라가면 page datatype이 아마도 integer로 바뀔듯
-                let data = { current_page_num: parseInt(page), last_page_num: 0, partner_idx: partner_idx, products: [], current_category: category, current_keyword: keyword};
+                let data = { current_page_num: parseInt(page), last_page_num: 0, partner_idx: partner_idx, products: [], current_category: category, current_keyword: keyword };
                 // 검색 키워드와 카테고리가 모두 설정되지 않은 경우
                 if (!keyword && !category) {
-                    products = await Product.find({ partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1, category_idx: 1}).sort({ created_at: -1 });
-                    
+                    products = await Product.find({ partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, detail_img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1, category_idx: 1 }).sort({ created_at: -1 });
+
                 }
                 // 검색 키워드가 존재할 경우 키워드가 포함된 모든 상품 리스트 출력
                 else if (keyword && !category) {
-                    products = await Product.find({ detail_name: { $regex: keyword }, partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1, category_idx: 1}).sort({ created_at: -1 });
+                    products = await Product.find({ $or: [{barcode: { $regex: keyword }}, {detail_name: { $regex: keyword }}], partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, detail_img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1, category_idx: 1 }).sort({ created_at: -1 });
                 }
                 // 카테고리가 설정된 경우 카테고리를 기준으로 검색된 모든 상품 리스트 출력
                 else if (!keyword && category) {
                     category_idx = await Category.find({ name: category }).select({ _id: 1 }).sort({ created_at: -1 });
                     console.log("category_idx : " + category_idx)
-                    products = await Product.find({ category_idx: category_idx, partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1 }).sort({ created_at: -1 });
+                    products = await Product.find({ category_idx: category_idx, partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, detail_img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1 }).sort({ created_at: -1 });
                 }
                 // 검색 키워드와 카테고리가 모두 설정된 경우
                 else {
                     category_idx = await Category.find({ name: category }).select({ _id: 1 }).sort({ created_at: -1 });
                     console.log("category_idx : " + category_idx)
-                    products = await Product.find({ detail_name: { $regex: keyword }, category_idx: category_idx, partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1 }).sort({ created_at: -1 });
+                    products = await Product.find({ $or: [{barcode: { $regex: keyword }}, {detail_name: { $regex: keyword }}], category_idx: category_idx, partner_idx: partner_idx, enabled: true, one_hundred_deal_event: false }).select({ _id: 1, barcode: 1, img: 1, detail_img: 1, name: 1, detail_name: 1, standard: 1, original_price: 1, count: 1 }).sort({ created_at: -1 });
                 }
-
+                console.log(products)
                 // offset, count 설정
                 let offset = (page - 1) * default_count;
                 let count = (products.length < offset + default_count) ? products.length - offset : default_count;
                 for (let i = offset; i < offset + count; i++) {
-                    if(!category){
+                    if (!category) {
                         temp_category = await Category.find({ _id: products[i].category_idx }).select({ name: 1 }).sort({ created_at: -1 });
-                    	temp_category = temp_category[0].name;
-		    } else {
+                        temp_category = temp_category[0].name;
+                    } else {
                         temp_category = category;
                     }
                     let product = {
                         product_id: products[i]._id,
-                        img: products[i].img[0],
+                        img: products[i].img,
+                        detail_img: products[i].detail_img,
                         barcode: products[i].barcode,
                         brand: products[i].name,
                         detail_name: products[i].detail_name,
@@ -112,7 +113,6 @@ router.get('/management', async (req, res) => {
                         count: products[i].count,
                         category: temp_category
                     };
-                    console.log(product);
                     data.products.push(product);
                 }
 

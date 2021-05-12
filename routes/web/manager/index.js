@@ -16,7 +16,7 @@ router.use('/order/approval', require('./function/order_approve')); // 주문 �
 router.use('/order/rejection', require('./function/order_reject')); // 주문 요청 거절 API
 router.use('/order/status', require('./function/change_order_status')); // 주문 상태 변경 API (배송전->배송중->배송완료)
 router.use('/qnas/answer', require('./function/answer')); // QnA 답변 저장 및 수정 API
-router.use('/products/change', require('./function/product_change')); // 상품 가격변경, 수량변경, 삭제 API
+router.use('/:partner_idx/products/change', require('./function/product_change')); // 상품 가격변경, 수량변경, 삭제 API
 router.use('/:partner_idx/enroll', require('./function/enroll')); // 상품 낱개 등록 API
 router.use('/:partner_idx/enroll_excel', require('./function/enroll_excel')); // 상품 일괄 등록 API
 router.use('/:partner_idx/enroll_event', require('./function/enroll_event')); // 할인 상품 등록 API

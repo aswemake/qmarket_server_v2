@@ -7,8 +7,8 @@ const resMessage = require('../../../../module/response/responseMessage');
 const statusCode = require('../../../../module/response/statusCode');
 const pool = require('../../../../config/dbConfig');
 
-//스키마 참고해서 필요한거 더 추가
 let Product = require('../../../../schemas/product_v2');
+let Category = require('../../../../schemas/category_v2');
 
 // 상품 가격변경, 수량변경, 삭제 API
 router.put('/price', async (req, res) => {
@@ -103,20 +103,67 @@ router.put('/batch_management', async (req, res) => {
         res.redirect('../../../start');
     } else {
         try {
+            const { partner_idx } = req.params;
             let file = JSON.parse(req.body.file);
             if (!file) {
-                res.status(200).json(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
+                res.status(201).json(utils.successFalse(statusCode.BAD_REQUEST, resMessage.NULL_VALUE));
             } else {
-                console.log("등록 예정 이벤트 수 : " + (file.length-1));
-                for (let i = 1; i < file.length; i++) {
-                    let original_price = Number(file[i].original_price);
-                    let count = Number(file[i].count);
-                    let update_product = 
-                        await Product.updateOne({ barcode : file[i].barcode , detail_name : file[i].detail_name }, { $set: { original_price : original_price , count : count } });
-        
-                    console.log(update_product);
+                let false_row = [];
+                let incorrect_rows = [];
+                let all_clear = true;
+                console.log("수정 예정 상품 수 : " + (file.length-2));
+                for (let i = 2; i < file.length; i++) {
+                    if(file[i].barcode == undefined || file[i].barcode == ""){
+                        all_clear = false;
+                        incorrect_rows.push(i+2);
+                        continue;
+                    }
+                    let check_barcode = await Product.find({ barcode : file[i].barcode , partner_idx : partner_idx , one_hundred_deal_event : false });
+                    if(check_barcode.length == 0){
+                        all_clear = false;
+                        false_row.push(i+2)
+                    } else {
+                        if(file[i].original_price != undefined && file[i].original_price != ""
+                            && file[i].count != undefined && file[i].count != ""){
+
+                            let original_price = Number(file[i].original_price);
+                            let count = Number(file[i].count);
+                            let update_product = 
+                                await Product.updateOne({ barcode : file[i].barcode }, { $set: { original_price : original_price , count : count } });
+                            console.log(update_product);
+
+                        } else if((file[i].original_price != undefined && file[i].original_price != "")
+                            && (file[i].count == undefined || file[i].count == "")){
+
+                            let original_price = Number(file[i].original_price);
+                            let update_product = 
+                                await Product.updateOne({ barcode : file[i].barcode }, { $set: { original_price : original_price } });
+                            console.log(update_product);
+
+                        } else if((file[i].original_price == undefined || file[i].original_price == "")
+                            && (file[i].count != undefined && file[i].count != "")){
+
+                            let count = Number(file[i].count);
+                            let update_product = 
+                                await Product.updateOne({ barcode : file[i].barcode }, { $set: { count : count } });
+                            console.log(update_product);
+
+                        } else {
+                            all_clear = false;
+                            incorrect_rows.push(i+2);
+                        }
+                        
+                    }
                 }
-                res.status(200).json(utils.successTrue(statusCode.OK, resMessage.SAVE_SUCCESS));
+                if(all_clear){
+                    res.status(200).json(utils.successTrue(statusCode.OK, resMessage.SAVE_SUCCESS));
+                } else {
+                    console.log("상품이 등록되지 않은 바코드 넘버 수 : " + false_row.length)
+                    console.log(false_row)
+                    console.log("입력이 올바르지 않은 행 수 : " + incorrect_rows.length)
+                    console.log(incorrect_rows)
+                    res.status(202).json(utils.successTrue(statusCode.OK, resMessage.SAVE_SUCCESS));
+                }
             }
 
         } catch (err) {
