@@ -45,7 +45,7 @@ router.get('/', async (req, res) => {
             const delivery_charge_when_under_minimum_order_price = partner[0].delivery.charge.delivery_charge;
             
             // 상품 상세 정보 배송비 안내
-            let delivery_charge_text = `최소 주문금액: ${minimum_order_price}원\n배송비: ${free_delivery_price}원\n무료 배송: ${delivery_charge_when_under_minimum_order_price}원 이상\n(*배송지역마다 배송비가 상이합니다.)`;
+            let delivery_charge_text = `최소 주문금액: ${minimum_order_price.toLocaleString()}원\n배송비: ${delivery_charge_when_under_minimum_order_price.toLocaleString()}원\n무료 배송: ${free_delivery_price.toLocaleString()}원 이상\n(*배송지역마다 배송비가 상이합니다.)`;
             
             // total_price 입력되었을 경우 data.delivery_charge에 배송비 결과 출력
             if (total_price) {
