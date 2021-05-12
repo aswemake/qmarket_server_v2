@@ -99,6 +99,11 @@ const productSchema_v2 = new Schema({
     created_at: {
         type: Date,
         required: true
+    },
+    // 과면세 여부
+    vat: {
+        type: Boolean,
+        required: true
     }
 })
 
