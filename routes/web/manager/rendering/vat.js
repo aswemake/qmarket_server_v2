@@ -28,8 +28,8 @@ router.get('/form', async (req, res) => {
         }
     }
 })
+
 // 정산 및 부가세 리스트 조회 API
-// 검색할 수 있는 start_date, end_date 쿼리스트링 추가하기
 router.get('/', async (req, res) => {
     if (!req.signedCookies.user) {
         console.log("쿠키가 만료되었거나 로그인이 필요합니다.");
@@ -85,6 +85,11 @@ router.get('/', async (req, res) => {
                 let offset = (page - 1) * default_count;
                 let count = (adjustments.length < offset + default_count) ? adjustments.length - offset : default_count;
                 for (let i = offset; i < offset + count; i++) {
+                    // 상품 정보
+                    let products = await Product.find({ _id: adjustments[i].product_id }).select({ vat: 1 });
+                    if (products.length < 1) throw new Error("incorrect product_idx");
+                    let product = products[0];
+
                     // 카드수수료 및 결제망 이용료 계산
                     let card_fee = 0;
                     switch(adjustments[i].pay_method) {
@@ -106,7 +111,7 @@ router.get('/', async (req, res) => {
                     // 정산대금 계산
                     let settlement_price = (adjustments[i].price + one_hundred_deal_event_income + partner_income) - (card_fee + brokerage_program_usage_fee);
                     // 정산공급가 계산
-                    let settlement_supply_price = Math.floor(settlement_price / 1.1);
+                    let settlement_supply_price = (product.vat == true) ? Math.floor(settlement_price / 1.1) : settlement_price;
                     // 정산부가세 계산
                     let settlement_vat = settlement_price - settlement_supply_price;
 
@@ -115,14 +120,14 @@ router.get('/', async (req, res) => {
                         order_id: adjustments[i].order_id, // 주문번호
                         product_id: adjustments[i].product_id, // 상품번호
                         pay_method: adjustments[i].pay_method, // 결제수단
-                        price: adjustments[i].price, // 판매가
-                        card_fee: card_fee, // 카드수수료 및 결제망 이용료
-                        brokerage_program_usage_fee: brokerage_program_usage_fee, // 판촉 및 주문중개, 프로그램 이용료
-                        one_hundred_deal_event_income: one_hundred_deal_event_income, // 100원딜 이벤트 지원금
-                        partner_income: partner_income, // 상생지원금
-                        settlement_price: settlement_price, // 정산대금
-                        settlement_supply_price: settlement_supply_price, // 정산공급가
-                        settlement_vat: settlement_vat // 정산부가세
+                        price: `${adjustments[i].price.toLocaleString()}원`, // 판매가
+                        card_fee: `${card_fee.toLocaleString()}원`, // 카드수수료 및 결제망 이용료
+                        brokerage_program_usage_fee: `${brokerage_program_usage_fee.toLocaleString()}원`, // 판촉 및 주문중개, 프로그램 이용료
+                        one_hundred_deal_event_income: `${one_hundred_deal_event_income.toLocaleString()}원`, // 100원딜 이벤트 지원금
+                        partner_income: `${partner_income.toLocaleString()}원`, // 상생지원금
+                        settlement_price: `${settlement_price.toLocaleString()}원`, // 정산대금
+                        settlement_supply_price: `${settlement_supply_price.toLocaleString()}원`, // 정산공급가
+                        settlement_vat: `${settlement_vat.toLocaleString()}원` // 정산부가세
                     }
                     data.adjustments.push(adjustment);
                 }
@@ -131,8 +136,7 @@ router.get('/', async (req, res) => {
                 
                 res.render('manager/vat', { data });
             } catch (err) {
-                console.log(err);
-                // console.log(err.message);
+                console.log(err.message);
                 res.status(200).json(utils.successFalse(statusCode.INTERNAL_SERVER_ERROR, resMessage.INTERNAL_SERVER_ERROR));
             } finally {
                 connection.release();
