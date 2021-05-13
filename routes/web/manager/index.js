@@ -20,5 +20,6 @@ router.use('/:partner_idx/products/change', require('./function/product_change')
 router.use('/:partner_idx/enroll', require('./function/enroll')); // 상품 낱개 등록 API
 router.use('/:partner_idx/enroll_excel', require('./function/enroll_excel')); // 상품 일괄 등록 API
 router.use('/:partner_idx/enroll_event', require('./function/enroll_event')); // 할인 상품 등록 API
+router.use('/:partner_idx/vat/download', require('./function/vat_download')); // 부가세 신고자료 다운로드 API
 
 module.exports = router;
