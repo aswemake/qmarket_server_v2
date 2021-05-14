@@ -19,7 +19,7 @@ router.get('/', async (req, res) => {
         try {
             let data = new Object();
             let banners = [];
-            // const event_products_count = 20; // 전단 행사 상품 리스트 갯수
+            const event_products_count = 200; // 전단 행사 상품 리스트 갯수
             const one_hundred_deal_event_products_count = 10; // 100원딜 상품 리스트 갯수
             const latest_products_count = 100; // 최신 상품 리스트 갯수
             const start_index = 0; // 상품 검색 시작 인덱스
@@ -50,9 +50,11 @@ router.get('/', async (req, res) => {
                         }
                         // 이벤트 할인 상품
                         else {
-                            sale_ratio = ((price - saled_price) / price) + default_sale_ratio;
-                            saled_price = Math.floor(price * (1 - sale_ratio));
+                            // 1. saled_price 구하기
+                            saled_price = Math.floor(saled_price * (1 - default_sale_ratio));
                             saled_price = saled_price - (saled_price % 10);
+                            // 2. sale_ratio 구하기
+                            sale_ratio = (price - saled_price) / price;
                             sale_ratio = Math.floor(sale_ratio * 100);
                         }
                     }
@@ -119,8 +121,9 @@ router.get('/', async (req, res) => {
                                                                             }
                                                                         }
                                                                     }
-                                                                }
-                                                            ]);
+                                                                },
+                                                                { $sample: { size: event_products_count } }
+                                                            ]); console.log(event_products.length);
                 event_products = await set_response_format(event_products);
 
                 // [100원딜 찬스] -> 100원딜 이벤트 상품 one_hundred_deal_event_products_count개 출력
@@ -133,8 +136,10 @@ router.get('/', async (req, res) => {
                 
                 data = {
                     banner: banners,
-                    mart_event: event_products,
-                    one_hundred_deal_event: one_hundred_deal_event_products,
+                    // mart_event: event_products,
+                    recommend: event_products,
+                    // one_hundred_deal_event: one_hundred_deal_event_products,
+                    event: one_hundred_deal_event_products,
                     latest: latest_products
                 }
                 res.status(200).json(utils.successTrue(statusCode.OK, resMessage.READ_SUCCESS, data));

@@ -52,9 +52,11 @@ router.get('/', async (req, res) => {
                         }
                         // 이벤트 할인 상품
                         else {
-                            sale_ratio = ((price - saled_price) / price) + default_sale_ratio;
-                            saled_price = Math.floor(price * (1 - sale_ratio));
+                            // 1. saled_price 구하기
+                            saled_price = Math.floor(saled_price * (1 - default_sale_ratio));
                             saled_price = saled_price - (saled_price % 10);
+                            // 2. sale_ratio 구하기
+                            sale_ratio = (price - saled_price) / price;
                             sale_ratio = Math.floor(sale_ratio * 100);
                         }
                     }
@@ -229,9 +231,11 @@ router.get('/:product_idx', async (req, res) => {
                     }
                     // 이벤트 할인 상품
                     else {
-                        sale_ratio = ((price - saled_price) / price) + default_sale_ratio; //0.433
-                        saled_price = Math.floor(price * (1 - sale_ratio));
+                        // 1. saled_price 구하기
+                        saled_price = Math.floor(saled_price * (1 - default_sale_ratio));
                         saled_price = saled_price - (saled_price % 10);
+                        // 2. sale_ratio 구하기
+                        sale_ratio = (price - saled_price) / price;
                         sale_ratio = Math.floor(sale_ratio * 100);
                     }
                 }
