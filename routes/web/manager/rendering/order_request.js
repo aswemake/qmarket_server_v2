@@ -23,16 +23,31 @@ router.get('/', async (req, res) => {
         } else {
             try {
                 var connection = await pool.getConnection();
-                let data = [];
+                let data = new Object();
+                data = { today_order_count: 0, orders: [] }
                 let get_orders_query = `SELECT order_id, created_at AS order_date, payment, qmoney, delivery_price, receiver, phone, CONCAT(address, ' ', detail_address) AS address, delivery_memo, home_pwd, status
                                         FROM orders 
-                                        WHERE partner_idx = ? and status in (?, ?)
+                                        WHERE partner_idx = ? AND status in (?, ?)
                                         ORDER BY created_at DESC`;
                 let get_order_products_query = `SELECT product_id, price, count FROM orders_products WHERE order_id = ?`;
+                let get_today_order_count_query = `SELECT COUNT(*) AS count 
+                                                   FROM orders 
+                                                   WHERE partner_idx = ? AND created_at >= ? AND created_at <= ?`
 
                 let partner_info = await Partner.find({ _id: partner_idx }).select({ name: 1, address: 1, business_registration_number: 1 });
                 if (partner_info.length < 1) throw new Error('incorrect partner_idx');
 
+                // 해당 마트의 오늘 주문 갯수 구하기
+                let now = new Date(Date.now() + (3600000 * 9));
+                let year = now.getFullYear();
+                let month = ("0" + (1 + now.getMonth())).slice(-2);
+                let day = ("0" + now.getDate()).slice(-2);
+                let start = `${year}-${month}-${day} 00:00:00`;
+                let end = `${year}-${month}-${day} 23:59:59`;
+                let get_today_order_count_result = await connection.query(get_today_order_count_query, [partner_idx, start, end]);
+                data.today_order_count = get_today_order_count_result[0].count;
+
+                // 해당 마트의 주문 요청, 승인 상태 주문들 구하기
                 let orders = await connection.query(get_orders_query, [partner_idx, order_request_status, order_request_approval_status]);
                 for (let i = 0; i < orders.length; i++) {
                     let order_products = await connection.query(get_order_products_query, [orders[i].order_id]);
@@ -41,7 +56,6 @@ router.get('/', async (req, res) => {
                     let total_saled_price = 0;
                     for (let j = 0; j < order_products.length; j++) {
                         let product_info = await Product.find({ _id: order_products[j].product_id }).select({ detail_name: 1, original_price: 1, events:1 });
-                        console.log(product_info);
                         if (product_info.length < 1) throw new Error('incorrect product_idx');
                         let product = {
                             name: product_info[0].detail_name,
@@ -73,9 +87,8 @@ router.get('/', async (req, res) => {
                         partner_address: partner_info[0].address,
                         partner_business_registration_number: partner_info[0].business_registration_number
                     };
-                    data.push(order);
+                    data.orders.push(order);
                 }
-		console.log(data);
                 res.render('manager/order_request', { data });
             } catch (err) {
                 console.log(err.message);
