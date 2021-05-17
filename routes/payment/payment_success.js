@@ -105,17 +105,33 @@ router.post('/', jwt.isLoggedIn, async (req, res) => {
                         
                         
                         /* 결제 내역 저장 및 동기화 */
+
+                        // today_order_num 구하기
+                        let now = new Date(Date.now() + (3600000 * 9));
+                        let year = now.getFullYear();
+                        let month = ("0" + (1 + now.getMonth())).slice(-2);
+                        let day = ("0" + now.getDate()).slice(-2);
+                        let start_date = `${year}-${month}-${day} 00:00:00`;
+                        let end_date = `${year}-${month}-${day} 23:59:59`;
+                        let get_today_order_num_query = `SELECT IFNULL(max(today_order_num), 0) + 1 AS today_order_num
+                                                         FROM orders
+                                                         WHERE partner_idx = ? AND created_at >= ? AND created_at <= ?`;
+                        let get_today_order_num_result = await connection.query(get_today_order_num_query, [partner_idx, start_date, end_date]);
+                        if (get_today_order_num_result.length < 1) throw new Error("get_today_order_num_query error");
+                        const today_order_num = get_today_order_num_result[0].today_order_num;
         
                         // orders table save
                         let insert_orders_query = `INSERT INTO orders
                                                    (order_id, imp_uid, user_idx, partner_idx, 
                                                     pay_method, payment, coupon_idx, coupon_price, qmoney, delivery_price,
-                                                    receiver, phone, email, mail_number, address, detail_address, delivery_memo, home_pwd, is_paid)
+                                                    receiver, phone, email, mail_number, address, detail_address, delivery_memo, home_pwd,
+                                                    today_order_num, is_paid)
                                                    VALUES
-                                                   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+                                                   (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
                         let insert_orders_result = await connection.query(insert_orders_query, [merchant_uid, imp_uid, user_idx, partner_idx,
                                                                                                 pay_method, amountToBePaid, coupon_idx, coupon_price, qmoney, delivery_price,
-                                                                                                receiver, phone, email, mail_number, address, detail_address, delivery_memo, home_pwd, 1]);
+                                                                                                receiver, phone, email, mail_number, address, detail_address, delivery_memo, home_pwd,
+                                                                                                today_order_num, 1]);
                         // orders table save 예외처리
                         if (insert_orders_result.affectedRows !== 1) throw new Error ("insert orders table error");
         
